@@ -1,0 +1,7 @@
+eccodes
+python-eccodes
+boto3
+botocore
+requests
+
+cfgrib
