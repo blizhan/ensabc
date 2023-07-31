@@ -3,5 +3,5 @@ python-eccodes
 boto3
 botocore
 requests
-
+xarray
 cfgrib
