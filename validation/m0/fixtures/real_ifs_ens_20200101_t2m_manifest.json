@@ -1,0 +1,833 @@
+{
+  "data_bytes": 13135,
+  "data_file": "real_ifs_ens_20200101_t2m_data.json",
+  "data_sha256": "ae8f0349cc1c6cf189e1757c454163a5ec550dc5768b50c03cb9adf34f7baa64",
+  "init_time": "2020-01-01T00:00:00Z",
+  "kind": "real_ensemble",
+  "layout": {
+    "dtype": "float64",
+    "matrix_order": "member-major (values[member][point])",
+    "member_order": "ascending source member number (number=1..50)",
+    "shape": [
+      50,
+      9
+    ],
+    "spatial_order": "latitude-major then longitude-major"
+  },
+  "lead_seconds": 86400,
+  "members": [
+    {
+      "member_id": "ifs_ens_01",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 1,
+      "source_label": "1"
+    },
+    {
+      "member_id": "ifs_ens_02",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 2,
+      "source_label": "2"
+    },
+    {
+      "member_id": "ifs_ens_03",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 3,
+      "source_label": "3"
+    },
+    {
+      "member_id": "ifs_ens_04",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 4,
+      "source_label": "4"
+    },
+    {
+      "member_id": "ifs_ens_05",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 5,
+      "source_label": "5"
+    },
+    {
+      "member_id": "ifs_ens_06",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 6,
+      "source_label": "6"
+    },
+    {
+      "member_id": "ifs_ens_07",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 7,
+      "source_label": "7"
+    },
+    {
+      "member_id": "ifs_ens_08",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 8,
+      "source_label": "8"
+    },
+    {
+      "member_id": "ifs_ens_09",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 9,
+      "source_label": "9"
+    },
+    {
+      "member_id": "ifs_ens_10",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 10,
+      "source_label": "10"
+    },
+    {
+      "member_id": "ifs_ens_11",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 11,
+      "source_label": "11"
+    },
+    {
+      "member_id": "ifs_ens_12",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 12,
+      "source_label": "12"
+    },
+    {
+      "member_id": "ifs_ens_13",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 13,
+      "source_label": "13"
+    },
+    {
+      "member_id": "ifs_ens_14",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 14,
+      "source_label": "14"
+    },
+    {
+      "member_id": "ifs_ens_15",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 15,
+      "source_label": "15"
+    },
+    {
+      "member_id": "ifs_ens_16",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 16,
+      "source_label": "16"
+    },
+    {
+      "member_id": "ifs_ens_17",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 17,
+      "source_label": "17"
+    },
+    {
+      "member_id": "ifs_ens_18",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 18,
+      "source_label": "18"
+    },
+    {
+      "member_id": "ifs_ens_19",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 19,
+      "source_label": "19"
+    },
+    {
+      "member_id": "ifs_ens_20",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 20,
+      "source_label": "20"
+    },
+    {
+      "member_id": "ifs_ens_21",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 21,
+      "source_label": "21"
+    },
+    {
+      "member_id": "ifs_ens_22",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 22,
+      "source_label": "22"
+    },
+    {
+      "member_id": "ifs_ens_23",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 23,
+      "source_label": "23"
+    },
+    {
+      "member_id": "ifs_ens_24",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 24,
+      "source_label": "24"
+    },
+    {
+      "member_id": "ifs_ens_25",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 25,
+      "source_label": "25"
+    },
+    {
+      "member_id": "ifs_ens_26",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 26,
+      "source_label": "26"
+    },
+    {
+      "member_id": "ifs_ens_27",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 27,
+      "source_label": "27"
+    },
+    {
+      "member_id": "ifs_ens_28",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 28,
+      "source_label": "28"
+    },
+    {
+      "member_id": "ifs_ens_29",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 29,
+      "source_label": "29"
+    },
+    {
+      "member_id": "ifs_ens_30",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 30,
+      "source_label": "30"
+    },
+    {
+      "member_id": "ifs_ens_31",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 31,
+      "source_label": "31"
+    },
+    {
+      "member_id": "ifs_ens_32",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 32,
+      "source_label": "32"
+    },
+    {
+      "member_id": "ifs_ens_33",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 33,
+      "source_label": "33"
+    },
+    {
+      "member_id": "ifs_ens_34",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 34,
+      "source_label": "34"
+    },
+    {
+      "member_id": "ifs_ens_35",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 35,
+      "source_label": "35"
+    },
+    {
+      "member_id": "ifs_ens_36",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 36,
+      "source_label": "36"
+    },
+    {
+      "member_id": "ifs_ens_37",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 37,
+      "source_label": "37"
+    },
+    {
+      "member_id": "ifs_ens_38",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 38,
+      "source_label": "38"
+    },
+    {
+      "member_id": "ifs_ens_39",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 39,
+      "source_label": "39"
+    },
+    {
+      "member_id": "ifs_ens_40",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 40,
+      "source_label": "40"
+    },
+    {
+      "member_id": "ifs_ens_41",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 41,
+      "source_label": "41"
+    },
+    {
+      "member_id": "ifs_ens_42",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 42,
+      "source_label": "42"
+    },
+    {
+      "member_id": "ifs_ens_43",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 43,
+      "source_label": "43"
+    },
+    {
+      "member_id": "ifs_ens_44",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 44,
+      "source_label": "44"
+    },
+    {
+      "member_id": "ifs_ens_45",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 45,
+      "source_label": "45"
+    },
+    {
+      "member_id": "ifs_ens_46",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 46,
+      "source_label": "46"
+    },
+    {
+      "member_id": "ifs_ens_47",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 47,
+      "source_label": "47"
+    },
+    {
+      "member_id": "ifs_ens_48",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 48,
+      "source_label": "48"
+    },
+    {
+      "member_id": "ifs_ens_49",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 49,
+      "source_label": "49"
+    },
+    {
+      "member_id": "ifs_ens_50",
+      "role": "perturbed",
+      "source_coordinate": "number",
+      "source_coordinate_value": 50,
+      "source_label": "50"
+    }
+  ],
+  "points": [
+    {
+      "latitude": 42.1875,
+      "longitude": 5.625,
+      "point_id": "lat_42.1875_lon_5.625",
+      "source_grid_index": {
+        "latitude_index": 23,
+        "longitude_index": 1
+      }
+    },
+    {
+      "latitude": 42.1875,
+      "longitude": 11.25,
+      "point_id": "lat_42.1875_lon_11.25",
+      "source_grid_index": {
+        "latitude_index": 23,
+        "longitude_index": 2
+      }
+    },
+    {
+      "latitude": 42.1875,
+      "longitude": 16.875,
+      "point_id": "lat_42.1875_lon_16.875",
+      "source_grid_index": {
+        "latitude_index": 23,
+        "longitude_index": 3
+      }
+    },
+    {
+      "latitude": 47.8125,
+      "longitude": 5.625,
+      "point_id": "lat_47.8125_lon_5.625",
+      "source_grid_index": {
+        "latitude_index": 24,
+        "longitude_index": 1
+      }
+    },
+    {
+      "latitude": 47.8125,
+      "longitude": 11.25,
+      "point_id": "lat_47.8125_lon_11.25",
+      "source_grid_index": {
+        "latitude_index": 24,
+        "longitude_index": 2
+      }
+    },
+    {
+      "latitude": 47.8125,
+      "longitude": 16.875,
+      "point_id": "lat_47.8125_lon_16.875",
+      "source_grid_index": {
+        "latitude_index": 24,
+        "longitude_index": 3
+      }
+    },
+    {
+      "latitude": 53.4375,
+      "longitude": 5.625,
+      "point_id": "lat_53.4375_lon_5.625",
+      "source_grid_index": {
+        "latitude_index": 25,
+        "longitude_index": 1
+      }
+    },
+    {
+      "latitude": 53.4375,
+      "longitude": 11.25,
+      "point_id": "lat_53.4375_lon_11.25",
+      "source_grid_index": {
+        "latitude_index": 25,
+        "longitude_index": 2
+      }
+    },
+    {
+      "latitude": 53.4375,
+      "longitude": 16.875,
+      "point_id": "lat_53.4375_lon_16.875",
+      "source_grid_index": {
+        "latitude_index": 25,
+        "longitude_index": 3
+      }
+    }
+  ],
+  "provenance": {
+    "credentials_used": "none; the source bucket was read with anonymous access",
+    "extraction_steps": [
+      "Read the pinned WeatherBench 2 Zarr archive with the recorded object generations.",
+      "Select time index 1460 (2020-01-01T00:00:00) and prediction_timedelta index 4 (24 h).",
+      "Select number=1..50, latitude indices [23, 24, 25] and longitude indices [1, 2, 3].",
+      "Transpose to (number, latitude, longitude) and reshape to a 50x9 member-major matrix.",
+      "Store the matrix as little-endian float32 and record its SHA-256.",
+      "Restore the float32 values from the round-trippable decimal CSV and widen them to float64.",
+      "Write the float64 member-major JSON payload and record its SHA-256 here."
+    ],
+    "extraction_tool_source": {
+      "planning_spike": "specs/001-m0-baseline-validation/spikes/data/extract_sample.py",
+      "planning_spike_output": "specs/001-m0-baseline-validation/spikes/data/sample.csv",
+      "planning_spike_output_sha256": "18e007ed06688f54a7f1c1d11ab38453eaa7fc15c8733d059c02ab3ead2f1050"
+    },
+    "extraction_tool_version": "validation/m0/extract_sample.py (M0 formal extraction)",
+    "transformations": [
+      {
+        "detail": "The archive stores float32. The values were restored to their exact float32 representation and then widened to float64. The CSV decimal rendering was not treated as a float64 source value.",
+        "matrix_sha256_float32_le": "09b43dfbcf9738f787e4ef65295de96b2f7a75956c51ef3e92909d5e5d2e42fe",
+        "source_dtype": "little-endian float32",
+        "step": "float32 -> float64 widening",
+        "target_dtype": "float64"
+      },
+      {
+        "detail": "Source unit K is preserved; no Celsius conversion is applied.",
+        "step": "no unit conversion"
+      },
+      {
+        "detail": "The nine points are the source grid cells themselves; no regridding or interpolation was performed by the M0 extraction.",
+        "step": "no interpolation"
+      }
+    ]
+  },
+  "region": {
+    "description": "3x3 grid point window over western/central Europe around 50N, 10E",
+    "latitude_max": 53.4375,
+    "latitude_min": 42.1875,
+    "longitude_convention": "0-360 degrees east as stored by the source archive; no negative-longitude normalization was applied, and the point coordinates are the actual source coordinates.",
+    "longitude_max": 16.875,
+    "longitude_min": 5.625,
+    "point_order": "latitude-major then longitude-major"
+  },
+  "sample_id": "ifs_ens_20200101_t2m_50x9",
+  "schema_version": "m0.sample.v1",
+  "source": {
+    "init_time_evidence": {
+      "init_time": "2020-01-01T00:00:00",
+      "lead_hours": 24,
+      "note": "The initialization is addressed by the pinned archive object generation recorded in object_generations, not by a 'latest' alias.",
+      "source_prediction_timedelta_index": 4,
+      "source_time_index": 1460,
+      "valid_time": "2020-01-02T00:00:00"
+    },
+    "member_set": [
+      {
+        "member_id": "ifs_ens_01",
+        "role": "perturbed",
+        "source_label": "1"
+      },
+      {
+        "member_id": "ifs_ens_02",
+        "role": "perturbed",
+        "source_label": "2"
+      },
+      {
+        "member_id": "ifs_ens_03",
+        "role": "perturbed",
+        "source_label": "3"
+      },
+      {
+        "member_id": "ifs_ens_04",
+        "role": "perturbed",
+        "source_label": "4"
+      },
+      {
+        "member_id": "ifs_ens_05",
+        "role": "perturbed",
+        "source_label": "5"
+      },
+      {
+        "member_id": "ifs_ens_06",
+        "role": "perturbed",
+        "source_label": "6"
+      },
+      {
+        "member_id": "ifs_ens_07",
+        "role": "perturbed",
+        "source_label": "7"
+      },
+      {
+        "member_id": "ifs_ens_08",
+        "role": "perturbed",
+        "source_label": "8"
+      },
+      {
+        "member_id": "ifs_ens_09",
+        "role": "perturbed",
+        "source_label": "9"
+      },
+      {
+        "member_id": "ifs_ens_10",
+        "role": "perturbed",
+        "source_label": "10"
+      },
+      {
+        "member_id": "ifs_ens_11",
+        "role": "perturbed",
+        "source_label": "11"
+      },
+      {
+        "member_id": "ifs_ens_12",
+        "role": "perturbed",
+        "source_label": "12"
+      },
+      {
+        "member_id": "ifs_ens_13",
+        "role": "perturbed",
+        "source_label": "13"
+      },
+      {
+        "member_id": "ifs_ens_14",
+        "role": "perturbed",
+        "source_label": "14"
+      },
+      {
+        "member_id": "ifs_ens_15",
+        "role": "perturbed",
+        "source_label": "15"
+      },
+      {
+        "member_id": "ifs_ens_16",
+        "role": "perturbed",
+        "source_label": "16"
+      },
+      {
+        "member_id": "ifs_ens_17",
+        "role": "perturbed",
+        "source_label": "17"
+      },
+      {
+        "member_id": "ifs_ens_18",
+        "role": "perturbed",
+        "source_label": "18"
+      },
+      {
+        "member_id": "ifs_ens_19",
+        "role": "perturbed",
+        "source_label": "19"
+      },
+      {
+        "member_id": "ifs_ens_20",
+        "role": "perturbed",
+        "source_label": "20"
+      },
+      {
+        "member_id": "ifs_ens_21",
+        "role": "perturbed",
+        "source_label": "21"
+      },
+      {
+        "member_id": "ifs_ens_22",
+        "role": "perturbed",
+        "source_label": "22"
+      },
+      {
+        "member_id": "ifs_ens_23",
+        "role": "perturbed",
+        "source_label": "23"
+      },
+      {
+        "member_id": "ifs_ens_24",
+        "role": "perturbed",
+        "source_label": "24"
+      },
+      {
+        "member_id": "ifs_ens_25",
+        "role": "perturbed",
+        "source_label": "25"
+      },
+      {
+        "member_id": "ifs_ens_26",
+        "role": "perturbed",
+        "source_label": "26"
+      },
+      {
+        "member_id": "ifs_ens_27",
+        "role": "perturbed",
+        "source_label": "27"
+      },
+      {
+        "member_id": "ifs_ens_28",
+        "role": "perturbed",
+        "source_label": "28"
+      },
+      {
+        "member_id": "ifs_ens_29",
+        "role": "perturbed",
+        "source_label": "29"
+      },
+      {
+        "member_id": "ifs_ens_30",
+        "role": "perturbed",
+        "source_label": "30"
+      },
+      {
+        "member_id": "ifs_ens_31",
+        "role": "perturbed",
+        "source_label": "31"
+      },
+      {
+        "member_id": "ifs_ens_32",
+        "role": "perturbed",
+        "source_label": "32"
+      },
+      {
+        "member_id": "ifs_ens_33",
+        "role": "perturbed",
+        "source_label": "33"
+      },
+      {
+        "member_id": "ifs_ens_34",
+        "role": "perturbed",
+        "source_label": "34"
+      },
+      {
+        "member_id": "ifs_ens_35",
+        "role": "perturbed",
+        "source_label": "35"
+      },
+      {
+        "member_id": "ifs_ens_36",
+        "role": "perturbed",
+        "source_label": "36"
+      },
+      {
+        "member_id": "ifs_ens_37",
+        "role": "perturbed",
+        "source_label": "37"
+      },
+      {
+        "member_id": "ifs_ens_38",
+        "role": "perturbed",
+        "source_label": "38"
+      },
+      {
+        "member_id": "ifs_ens_39",
+        "role": "perturbed",
+        "source_label": "39"
+      },
+      {
+        "member_id": "ifs_ens_40",
+        "role": "perturbed",
+        "source_label": "40"
+      },
+      {
+        "member_id": "ifs_ens_41",
+        "role": "perturbed",
+        "source_label": "41"
+      },
+      {
+        "member_id": "ifs_ens_42",
+        "role": "perturbed",
+        "source_label": "42"
+      },
+      {
+        "member_id": "ifs_ens_43",
+        "role": "perturbed",
+        "source_label": "43"
+      },
+      {
+        "member_id": "ifs_ens_44",
+        "role": "perturbed",
+        "source_label": "44"
+      },
+      {
+        "member_id": "ifs_ens_45",
+        "role": "perturbed",
+        "source_label": "45"
+      },
+      {
+        "member_id": "ifs_ens_46",
+        "role": "perturbed",
+        "source_label": "46"
+      },
+      {
+        "member_id": "ifs_ens_47",
+        "role": "perturbed",
+        "source_label": "47"
+      },
+      {
+        "member_id": "ifs_ens_48",
+        "role": "perturbed",
+        "source_label": "48"
+      },
+      {
+        "member_id": "ifs_ens_49",
+        "role": "perturbed",
+        "source_label": "49"
+      },
+      {
+        "member_id": "ifs_ens_50",
+        "role": "perturbed",
+        "source_label": "50"
+      }
+    ],
+    "member_set_description": "50 perturbed members (number=1..50); no number=0 control member is present in this file.",
+    "model": "ECMWF IFS ensemble prediction system (ENS)",
+    "object_generations": {
+      ".zmetadata": {
+        "generation": "1704461457118357",
+        "size_bytes": 19874
+      },
+      "2m_temperature/365.0.4.0.0": {
+        "generation": "1704550502844049",
+        "size_bytes": 1049445
+      },
+      "latitude/0": {
+        "generation": "1704461459285842",
+        "size_bytes": 169
+      },
+      "longitude/0": {
+        "generation": "1704461459039650",
+        "size_bytes": 192
+      },
+      "number/0": {
+        "generation": "1704461459341184",
+        "size_bytes": 90
+      },
+      "prediction_timedelta/0": {
+        "generation": "1704461459252726",
+        "size_bytes": 114
+      },
+      "time/0": {
+        "generation": "1704461459436554",
+        "size_bytes": 1279
+      }
+    },
+    "product": "IFS ENS 2018-2022 64x32 equiangular conservative regrid",
+    "provider": "ECMWF (via Google WeatherBench 2)",
+    "retrieved_at": "2026-10-20T13:45:20.938657+00:00",
+    "source_chunks": [
+      4,
+      50,
+      1,
+      64,
+      32
+    ],
+    "source_dims": [
+      "time",
+      "number",
+      "prediction_timedelta",
+      "longitude",
+      "latitude"
+    ],
+    "source_document": "https://weatherbench2.readthedocs.io/en/latest/data-guide.html#ifs-ens",
+    "source_object_payload_bytes": 1071163,
+    "uri": "gs://weatherbench2/datasets/ifs_ens/2018-2022-64x32_equiangular_conservative.zarr"
+  },
+  "usage": {
+    "attribution": "ECMWF IFS ensemble forecasts, downloaded from the TIGGE archive and re-gridded and republished by Google Research as WeatherBench 2. WeatherBench 2 is licensed under Apache 2.0 for the code and dataset tooling.",
+    "license": "WeatherBench 2 documents that the IFS ENS archive originates from the TIGGE archive and that 'All data from the TIGGE archive can only be used for research purposes. Please check the license for more specific constraints.' No LICENSE object exists at the pinned GCS paths, so the exact licence file for this re-gridded derivative could not be retrieved. The current ECMWF TIGGE terms publish the ECMWF contribution under CC BY 4.0, but this repository does not assert that those terms govern the WeatherBench 2 re-gridded object.",
+    "license_evidence": [
+      "https://weatherbench2.readthedocs.io/en/latest/data-guide.html#ifs-ens",
+      "https://ecds.ecmwf.int/licences/tigge-licence"
+    ],
+    "license_status": "unresolved_for_redistribution",
+    "recovery": "The payload is regenerated deterministically by running `python3 validation/m0/extract_sample.py --rebuild` in an environment with the locked data dependencies, which re-reads the pinned object generations and reproduces the same float32 matrix SHA-256. The numeric payload is therefore recoverable and verifiable by any reviewer with network access to the source bucket, without requiring the repository to redistribute the data.",
+    "restrictions": "Research use is stated by the source documentation. Redistribution permission for the re-gridded derivative is not established, so the frozen numeric payload is not committed to the repository; the manifest, the source generation evidence and the recovery procedure are committed instead."
+  },
+  "valid_time": "2020-01-02T00:00:00Z",
+  "variable": {
+    "conversion": "unchanged; the source values are stored in K and the frozen payload keeps K. The float32 source values are widened to float64 without changing their value.",
+    "height": "2 m above ground",
+    "meaning": "2 metre temperature",
+    "normalized_units": "K",
+    "source_name": "2m_temperature",
+    "source_units": "K"
+  }
+}

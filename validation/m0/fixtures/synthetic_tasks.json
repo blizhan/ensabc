@@ -1,0 +1,135 @@
+{
+  "schema_version": "m0.synthetic-tasks.v1",
+  "kind": "synthetic",
+  "note": "Synthetic validation tasks for the M0 SQL boundary. These fixtures are NOT a real ensemble sample and must never satisfy the FR-001 real-sample gate.",
+  "invalid_category_count": 10,
+  "invalid_category_note": "The 10 illegal-input categories are fixed by the validation contract: top_level_null, empty_member_list, null_member_item, null_or_empty_member_id, duplicate_member_id, null_or_empty_features_list, null_feature_element, nan_feature_element, infinite_feature_element, unequal_feature_lengths. `invalid` carries one executable case per category, with the two 'null_or_empty_*' categories split into a NULL and an empty case so that both sub-cases are covered.",
+  "positive": [
+    {
+      "case_id": "single_member_single_feature",
+      "task_id": "synthetic-pos-01",
+      "members": [
+        {"member_id": "m01", "features": [1.5]}
+      ]
+    },
+    {
+      "case_id": "two_members_two_features",
+      "task_id": "synthetic-pos-02",
+      "members": [
+        {"member_id": "m01", "features": [1.0, 2.0]},
+        {"member_id": "m02", "features": [3.0, 4.0]}
+      ]
+    },
+    {
+      "case_id": "string_ids_preserved_verbatim",
+      "task_id": "synthetic-pos-03",
+      "members": [
+        {"member_id": "  Mixed Case Id  ", "features": [10.0]},
+        {"member_id": "unicode-成员-01", "features": [11.0]}
+      ]
+    },
+    {
+      "case_id": "duplicate_values_distinct_identities",
+      "task_id": "synthetic-pos-04",
+      "members": [
+        {"member_id": "m01", "features": [7.0, 7.0]},
+        {"member_id": "m02", "features": [7.0, 7.0]}
+      ]
+    },
+    {
+      "case_id": "negative_and_fractional_values",
+      "task_id": "synthetic-pos-05",
+      "members": [
+        {"member_id": "m01", "features": [-273.15, 0.0]},
+        {"member_id": "m02", "features": [-0.5, 1e-8]}
+      ]
+    },
+    {
+      "case_id": "different_legal_shapes_across_tasks",
+      "task_id": "synthetic-pos-06",
+      "members": [
+        {"member_id": "m01", "features": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]}
+      ]
+    }
+  ],
+  "invalid": [
+    {
+      "case_id": "top_level_null",
+      "category": "top_level_null",
+      "sql": "SELECT ens_m0_echo(NULL::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["NULL"]
+    },
+    {
+      "case_id": "empty_member_list",
+      "category": "empty_member_list",
+      "sql": "SELECT ens_m0_echo([]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["empty"]
+    },
+    {
+      "case_id": "null_member_item",
+      "category": "null_member_item",
+      "sql": "SELECT ens_m0_echo([NULL::STRUCT(member_id VARCHAR, features DOUBLE[])]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["item", "NULL"]
+    },
+    {
+      "case_id": "null_member_id",
+      "category": "null_or_empty_member_id",
+      "sql": "SELECT ens_m0_echo([{'member_id': NULL, 'features': [1.0]}]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["member_id", "NULL"]
+    },
+    {
+      "case_id": "empty_member_id",
+      "category": "null_or_empty_member_id",
+      "sql": "SELECT ens_m0_echo([{'member_id': '', 'features': [1.0]}]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["member_id", "empty"]
+    },
+    {
+      "case_id": "duplicate_member_id",
+      "category": "duplicate_member_id",
+      "sql": "SELECT ens_m0_echo([{'member_id': 'dup', 'features': [1.0]}, {'member_id': 'dup', 'features': [2.0]}]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["duplicate", "member_id"]
+    },
+    {
+      "case_id": "null_features_list",
+      "category": "null_or_empty_features_list",
+      "sql": "SELECT ens_m0_echo([{'member_id': 'm01', 'features': NULL}]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["features", "NULL"]
+    },
+    {
+      "case_id": "empty_features_list",
+      "category": "null_or_empty_features_list",
+      "sql": "SELECT ens_m0_echo([{'member_id': 'm01', 'features': []}]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["features", "empty"]
+    },
+    {
+      "case_id": "null_feature_element",
+      "category": "null_feature_element",
+      "sql": "SELECT ens_m0_echo([{'member_id': 'm01', 'features': [1.0, NULL]}]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["feature", "NULL"]
+    },
+    {
+      "case_id": "nan_feature_element",
+      "category": "nan_feature_element",
+      "sql": "SELECT ens_m0_echo([{'member_id': 'm01', 'features': ['NaN'::DOUBLE]}]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["feature", "non-finite"]
+    },
+    {
+      "case_id": "infinite_feature_element",
+      "category": "infinite_feature_element",
+      "sql": "SELECT ens_m0_echo([{'member_id': 'm01', 'features': ['Infinity'::DOUBLE]}]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["feature", "non-finite"]
+    },
+    {
+      "case_id": "unequal_feature_lengths",
+      "category": "unequal_feature_lengths",
+      "sql": "SELECT ens_m0_echo([{'member_id': 'm01', 'features': [1.0, 2.0]}, {'member_id': 'm02', 'features': [3.0]}]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+      "expect_message_contains": ["length"]
+    }
+  ],
+  "type_binding_rejection": {
+    "case_id": "type_binding_rejection",
+    "sql": "SELECT ens_m0_echo([{'member_id': 'm01', 'features': ['not-a-number']}]::STRUCT(member_id VARCHAR, features DOUBLE[])[]);",
+    "expect_message_contains": [],
+    "note": "A type error is rejected by the binder and must be reported separately from the in-function data-validation errors."
+  }
+}

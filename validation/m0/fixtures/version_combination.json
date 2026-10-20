@@ -1,0 +1,59 @@
+{
+  "schema_version": "m0.version-combination.v1",
+  "description": "The exact version combination that the M0 acceptance was produced with. M1 must either reuse this combination or record why it differs, so that a numerical difference can be attributed to the code and not to a dependency drift.",
+  "verified_platform": {
+    "system": "Linux",
+    "machine": "aarch64",
+    "architecture": "arm64",
+    "os_release": "Ubuntu 24.04.4 LTS"
+  },
+  "toolchain": {
+    "rustc": "1.96.0",
+    "cargo": "1.96.0",
+    "edition": "2024",
+    "rust_toolchain_file": "rust-toolchain.toml"
+  },
+  "host": {
+    "duckdb_cli": "1.5.5",
+    "duckdb_build": "d8cdaa33fd",
+    "extension_abi_type": "C_STRUCT_UNSTABLE",
+    "extension_platform": "linux_arm64"
+  },
+  "extension_dependencies": {
+    "duckdb": "=1.10505.0",
+    "libduckdb-sys": "1.10505.0",
+    "features": ["loadable-extension"],
+    "bundled_duckdb": false,
+    "lockfile": "Cargo.lock"
+  },
+  "reference_environment": {
+    "python": "3.13.13",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "scikit_learn": "1.9.1",
+    "threadpoolctl": "3.7.0",
+    "lockfile": "validation/m0/requirements-reference.lock"
+  },
+  "data_environment": {
+    "python": "3.13.13",
+    "xarray": "2026.9.0",
+    "zarr": "3.4.1",
+    "gcsfs": "2026.10.1",
+    "lockfile": "validation/m0/requirements-data.lock"
+  },
+  "packaging_tool": {
+    "name": "extension-ci-tools",
+    "commit": "b777c70d30942cca5bef62d6d4fa23a13362f398",
+    "role": "development-only; it appends the extension metadata and is not part of the extension's dependency graph or its runtime path"
+  },
+  "reference_tooling_excluded_from_the_runtime": [
+    "python",
+    "numpy",
+    "scipy",
+    "scikit-learn",
+    "cdo",
+    "wgrib",
+    "wgrib2"
+  ],
+  "m1_note": "M1 may choose a different numerical stack, but it must record the combination it used and compare against this baseline. The DuckDB extension version and the ABI type are tied to the host: changing either requires re-verifying the extension load and the error recovery."
+}

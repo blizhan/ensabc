@@ -1,0 +1,14 @@
+[workspace]
+resolver = "3"
+members = ["crates/ensabc-duckdb"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.96"
+license = "MIT"
+
+[workspace.dependencies]
+duckdb = { version = "=1.10505.0", default-features = false, features = [
+    "loadable-extension",
+] }

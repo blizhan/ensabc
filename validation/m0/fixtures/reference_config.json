@@ -1,0 +1,76 @@
+{
+  "schema_version": "m0.reference-config.v1",
+  "description": "Locked reference configuration for the M0 numerical baseline. Every value is explicit: no library default may drift between runs. The comparison rules are fixed here so that they are in place before any acceptance result is produced.",
+  "dtype": "float64",
+  "input": {
+    "matrix_order": "member-major (values[member][feature])",
+    "member_ids": "taken from the sample manifest, in manifest order",
+    "requirements": {
+      "finite_values": true,
+      "unique_member_ids": true,
+      "members_must_match_matrix_rows": true,
+      "minimum_members": 3,
+      "minimum_distinguishable_member_vectors": 3,
+      "constant_features": "retained; the scaler handles them"
+    }
+  },
+  "standard_scaler": {
+    "with_mean": true,
+    "with_std": true
+  },
+  "pca": {
+    "n_components": 2,
+    "svd_solver": "full",
+    "whiten": false
+  },
+  "kmeans": {
+    "n_clusters": 3,
+    "init": "k-means++",
+    "n_init": 10,
+    "random_state": 0,
+    "algorithm": "lloyd",
+    "max_iter": 300,
+    "tol": 0.0001
+  },
+  "validity": {
+    "rank_threshold": 1e-10,
+    "rank_rule": "the numerical rank of the standardized matrix, computed with a singular-value threshold of 1e-10, must be at least 2 so that a two-dimensional projection is non-degenerate",
+    "minimum_rank_after_scaling": 2,
+    "minimum_distinguishable_vectors": 3,
+    "degenerate_subspace_rule": "when the rank, the retained-subspace geometry or the member partition cannot be determined, the comparison fails; the cluster count and the projection dimension are never reduced automatically"
+  },
+  "comparison": {
+    "absolute_tolerance": 1e-8,
+    "relative_tolerance": 1e-6,
+    "formula": "abs(actual - reference) <= 1e-8 + 1e-6 * abs(reference)",
+    "label_rule": "labels are canonicalized by first member occurrence, so a cluster-number permutation is not a difference",
+    "pca_sign_rule": "each component is sign-normalized so that its largest-absolute loading is positive; the matching score column is flipped with it",
+    "cluster_center_rule": "cluster centers are compared after the member partition is matched and after the same sign normalization is applied",
+    "partition_rule": "the member partition is compared by co-membership, not by cluster number",
+    "subspace_rule": "the retained subspace is compared through the projection matrix and the pairwise member distances; a sign flip of the retained subspace is equivalent",
+    "numeric_fields_compared": [
+      "mean",
+      "scale",
+      "scaled",
+      "components",
+      "explained_variance_ratio",
+      "scores",
+      "inertia"
+    ],
+    "integer_fields_compared": [
+      "rank_after_scaling",
+      "n_iter"
+    ]
+  },
+  "execution": {
+    "thread_limit": 1,
+    "independent_processes": 3,
+    "process_isolation": "each reference run is a separate operating-system process; the recorded pids must be distinct"
+  },
+  "environment": {
+    "python": "3.13.13",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "scikit_learn": "1.9.1"
+  }
+}

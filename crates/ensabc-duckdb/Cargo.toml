@@ -1,0 +1,14 @@
+[package]
+name = "ensabc-duckdb"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "M0 DuckDB extension exposing the ens_m0_echo diagnostic roundtrip boundary"
+
+[lib]
+name = "ensabc_m0_extension"
+crate-type = ["cdylib"]
+
+[dependencies]
+duckdb = { workspace = true }

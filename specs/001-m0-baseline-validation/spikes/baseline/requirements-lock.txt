@@ -1,0 +1,9 @@
+# Python 3.13.13; captured on Linux aarch64.
+cloudpickle==3.1.2
+joblib==1.6.0
+narwhals==2.27.1
+numpy==2.5.4
+pip==26.0.1
+scikit-learn==1.9.1
+scipy==1.18.1
+threadpoolctl==3.7.0
