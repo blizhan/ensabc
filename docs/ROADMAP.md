@@ -219,7 +219,7 @@ FR-014 全部有实测证据。证据位于 `artifacts/m0/<run-id>/`，复核命
 | 需求追溯 | FR-001–FR-014 逐条绑定到 83 项**可执行断言**（指向证据文件的具体字段）；正向覆盖 14/14 无遗漏，反向覆盖无孤立断言，矩阵推导判定与 `report.json` 一致 | `traceability.json` |
 | 成功标准 | SC-001–SC-006 逐条绑定到 38 项**可执行断言**，全部通过；SC-006 的“独立环境复现”由 `reproduce_independently.py` 在单独目录重跑样本/参考/扩展并逐项比对 | `traceability.json`、`independent-reproduction.json` |
 | 版本组合 | 平台、Rust 工具链、DuckDB 宿主与 ABI、扩展依赖、参考与数据环境、打包工具修订全部作为**独立文档**固定，供 M1 复用或声明差异 | `validation/m0/fixtures/version_combination.json` |
-| 独立验证者复现 | 仓库复制提交后 `git clone` 到全新目录，在克隆中运行完整门禁得 `passed`（14/14）；源矩阵与载荷 SHA-256 逐字节相同，成员分区与全部中间量相同（`inertia` 差 2.8e-14，低于 1e-8 容差），仅清单的 `retrieved_at` 因记录获取时间而不同 | `specs/001-m0-baseline-validation/quickstart.md` 第 8 节 |
+| 独立验证者复现 | M0 工作已提交（`1408aea`），`git clone` 到全新目录后在克隆中运行完整门禁得 `passed`（14/14），审计与追溯矩阵均 `pass`；源矩阵与载荷 SHA-256 逐字节相同，成员分区与全部中间量相同（`inertia` 差 2.8e-14，低于 1e-8 容差），仅清单的 `retrieved_at` 因记录获取时间而不同 | `specs/001-m0-baseline-validation/quickstart.md` 第 8 节 |
 
 **遗留限制（不影响 M0 判定，但影响后续）：**
 
@@ -241,6 +241,9 @@ FR-014 全部有实测证据。证据位于 `artifacts/m0/<run-id>/`，复核命
   可能解释地验证”。
 - 独立验证者复现已在本轮实测（见 quickstart 第 8 节），但复现使用的是同一台
   机器、同一网络与同一组已缓存的 Python 环境；换一台机器的完整复现未执行。
+- 本轮把 M0 工作提交进版本控制（`04224d7`、`1408aea`），仓库历史中同时包含
+  规划期与正式实现；`artifacts/m0/` 仍不入库，因为它是可由门禁重新生成的证据，
+  而非源材料。
 
 这两条实验线可并行。此阶段无需全面重构旧下载器或一次性恢复所有教程。
 
