@@ -29,6 +29,12 @@ bash validation/m0/setup_env.sh --check  # 只核对已建立的环境
 依赖安装需要网络；冻结样本核验、参考计算和扩展验收不需要网络（样本首次
 重建除外，见第 2 节）。
 
+本次验收使用的**完整版本组合**固定在
+[version_combination.json](fixtures/version_combination.json)：平台、Rust 工具链、
+DuckDB 宿主与扩展 ABI 类型、扩展依赖版本、参考与数据环境的库版本，以及打包
+工具的修订。M1 可以换用其他数值栈，但必须记录自己用的组合；扩展的 DuckDB
+版本与 ABI 类型与宿主绑定，改动任一项都需重新验证扩展加载与错误恢复。
+
 ## 2. 冻结样本
 
 **派生的数值载荷不提交到仓库**：WeatherBench 2 再加工衍生物的再分发许可尚未
@@ -160,6 +166,7 @@ sample-validation.json    sample-recovery.json
 reference/run-1.json      reference/run-2.json     reference/run-3.json
 reference/comparison.json reference/comparator-self-check.json
 exchange.json             measurements.json        minimal-runtime.json
+independent-reproduction.json
 steps.json                traceability.json        report.json
 report-audit.json
 ```
@@ -186,24 +193,37 @@ python3 validation/m0/verify_report.py --self-check
 预期：声称 `passed` 但有 `fail` 或 `not_run` 的报告被拒绝；仅覆盖合成样本
 的报告被拒绝为 M0 通过。
 
-## 7. 需求到证据的追溯矩阵
+## 7. 需求与成功标准到证据的追溯矩阵
 
-`validation/m0/traceability.py` 把 FR-001 至 FR-014 逐条绑定到**可执行断言**，
-每条断言指向一个证据文件里的具体字段并声明比较方式。矩阵是**从证据推导**
-的，不是手写状态，因此不会与实现悄悄偏离：证据一旦不再满足断言，矩阵就会
-报出来。
+`validation/m0/traceability.py` 把 FR-001 至 FR-014 **以及 SC-001 至 SC-006**
+逐条绑定到**可执行断言**，每条断言指向一个证据文件里的具体字段并声明比较方式。
+矩阵是**从证据推导**的，不是手写状态，因此不会与实现悄悄偏离：证据一旦不再
+满足断言，矩阵就会报出来。
 
 ```bash
 python3 validation/m0/traceability.py --run-dir artifacts/m0/<run-id>
 ```
 
-预期：`traceability: pass`，14/14 需求都有断言，正向覆盖完整（无遗漏需求）、
-反向覆盖完整（无孤立断言），且矩阵推导出的每条需求判定与 `report.json` 记录
-的判定一致。
+预期：`traceability: pass`，14/14 需求与 6/6 成功标准都有断言，正向覆盖完整
+（无遗漏需求或成功标准）、反向覆盖完整（无孤立断言），且矩阵推导出的每条需求
+判定与 `report.json` 记录的判定一致。
 
 门禁在写出 `report.json` 之后自动运行该矩阵。若矩阵不支持报告中的某个
 `pass`，该需求会被降级为 `fail`，整体判定随之改变——已通过注入故障验证
 （把非法输入类别数从 10 改成 8 后，门禁退出码变为 1、FR-006 降级）。
+
+### 成功标准（SC）的验证
+
+SC-006 要求“另一名验证者或独立干净环境能按步骤重现 SC-001 至 SC-004”。
+`validation/m0/reproduce_independently.py` 在**单独目录**里从已提交的源码重跑
+样本重建、参考基线与扩展验收，再把**内容**（而非文件名或时间戳）与本次运行
+逐项比对：
+
+```bash
+python3 validation/m0/reproduce_independently.py --baseline-run artifacts/m0/<run-id>
+```
+
+门禁把它作为一步自动执行，结果记入 `independent-reproduction.json`。
 
 ## 8. 独立验证者复现
 

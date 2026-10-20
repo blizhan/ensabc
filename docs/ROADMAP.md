@@ -216,7 +216,9 @@ FR-014 全部有实测证据。证据位于 `artifacts/m0/<run-id>/`，复核命
 | 资源测量 | 1/10/100 任务的冷启动与已加载两种口径墙钟时间、峰值 RSS、宿主线程设置与测量边界已记录；1/10/100 各验证串行与并发结果一致；未设吞吐阈值；无法分离的成本明确记为未分离 | `measurements.json` |
 | 最小运行环境 | 隔离容器（`--network none`）内无 Python 参考栈、无 `cdo`、无 `wgrib`/`wgrib2`，正向往返与错误恢复实际通过；扩展仅链接 libc/libgcc | `minimal-runtime.json` |
 | 报告完整性 | 独立复核器重新推导总体判定、核对引用可解析**并重算 artifact 的 SHA-256**，6 项门禁逻辑自检全通过 | `report.json`、`report-audit.json` |
-| 需求追溯 | FR-001–FR-014 逐条绑定到 87 项**可执行断言**（指向证据文件的具体字段）；正向覆盖 14/14 无遗漏，反向覆盖无孤立断言，矩阵推导判定与 `report.json` 一致 | `traceability.json` |
+| 需求追溯 | FR-001–FR-014 逐条绑定到 83 项**可执行断言**（指向证据文件的具体字段）；正向覆盖 14/14 无遗漏，反向覆盖无孤立断言，矩阵推导判定与 `report.json` 一致 | `traceability.json` |
+| 成功标准 | SC-001–SC-006 逐条绑定到 38 项**可执行断言**，全部通过；SC-006 的“独立环境复现”由 `reproduce_independently.py` 在单独目录重跑样本/参考/扩展并逐项比对 | `traceability.json`、`independent-reproduction.json` |
+| 版本组合 | 平台、Rust 工具链、DuckDB 宿主与 ABI、扩展依赖、参考与数据环境、打包工具修订全部作为**独立文档**固定，供 M1 复用或声明差异 | `validation/m0/fixtures/version_combination.json` |
 | 独立验证者复现 | 仓库复制提交后 `git clone` 到全新目录，在克隆中运行完整门禁得 `passed`（14/14）；源矩阵与载荷 SHA-256 逐字节相同，成员分区与全部中间量相同（`inertia` 差 2.8e-14，低于 1e-8 容差），仅清单的 `retrieved_at` 因记录获取时间而不同 | `specs/001-m0-baseline-validation/quickstart.md` 第 8 节 |
 
 **遗留限制（不影响 M0 判定，但影响后续）：**
