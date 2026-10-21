@@ -90,7 +90,7 @@ def audit_report(run_dir: Path) -> dict[str, Any]:
     findings: list[str] = []
 
     # The overall status must follow the aggregation rule.
-    derived = aggregate_overall(report["requirements"])
+    derived = aggregate_overall(report["requirements"], report.get("traceability", {}).get("status"))
     if derived != report["overall"]:
         findings.append(
             f"the recorded overall status {report['overall']!r} does not follow from the "
@@ -126,10 +126,14 @@ def audit_report(run_dir: Path) -> dict[str, Any]:
             traceability = None
             findings.append(f"the traceability record is not readable JSON: {error}")
         if traceability is not None:
+            recorded_traceability = report.get("traceability", {}).get("status")
+            if recorded_traceability is not None and recorded_traceability != traceability.get("status"):
+                findings.append("the report and traceability record disagree on the evidence gate status")
             if traceability.get("status") != "pass":
                 findings.append(
                     "the traceability matrix does not support the report: "
-                    f"{traceability.get('failed_assertions')}"
+                    f"FR failures {traceability.get('failed_assertions')}; "
+                    f"SC failures {traceability.get('failed_success_criterion_assertions')}"
                 )
             for requirement_id, record in report["requirements"].items():
                 derived = traceability.get("matrix", {}).get(requirement_id, {}).get("status")
@@ -232,7 +236,7 @@ def run_self_checks() -> dict[str, Any]:
             validate_gate_report(report)
         except ValidationError as error:
             findings.append(str(error))
-        derived = aggregate_overall(report["requirements"])
+        derived = aggregate_overall(report["requirements"], report.get("traceability", {}).get("status"))
         if derived != report["overall"]:
             findings.append(
                 f"the recorded overall status {report['overall']!r} does not follow from the "
@@ -281,6 +285,17 @@ def run_self_checks() -> dict[str, Any]:
         build_synthetic_report("incomplete", {"FR-013": "not_run"}),
         True,
     )
+
+    for status, overall in (("fail", "failed"), ("not_run", "incomplete")):
+        evidence_gate = build_synthetic_report(overall, {})
+        evidence_gate["traceability"] = {
+            "status": status,
+            "failed_assertions": [],
+            "failed_success_criterion_assertions": [{"assertion_id": "SC002-2"}] if status == "fail" else [],
+        }
+        expect(f"traceability_{status}", "the report records the evidence gate without changing FR verdicts", evidence_gate, True)
+        evidence_gate["overall"] = "passed"
+        expect(f"traceability_{status}_false_pass", "a failed or missing evidence gate prevents an overall pass", evidence_gate, False)
 
     # The synthetic-only pass must not be accepted as an M0 pass.
     synthetic_only = copy.deepcopy(build_synthetic_report("passed", {}))

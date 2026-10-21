@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import filecmp
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -48,7 +49,7 @@ PAYLOAD_PATH = FIXTURES_DIR / "real_ifs_ens_20200101_t2m_data.json"
 # the planning-time spike material.
 EXTRACTOR = VALIDATION_DIR / "extract_sample.py"
 
-DATA_VENV = Path("/tmp/ensabc-m0-data/.venv")
+DATA_VENV = Path(os.environ.get("ENSABC_M0_DATA_VENV") or "/tmp/ensabc-m0-data/.venv")
 DEFAULT_WORKDIR = Path("/tmp/ensabc-m0-live-reextract")
 
 

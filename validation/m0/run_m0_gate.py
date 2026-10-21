@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -52,8 +53,8 @@ PAYLOAD_PATH = FIXTURES_DIR / "real_ifs_ens_20200101_t2m_data.json"
 CONFIG_PATH = FIXTURES_DIR / "reference_config.json"
 
 DEFAULT_EXTENSION = Path("/tmp/ensabc-m0-extension-target/ensabc_m0_extension.duckdb_extension")
-REFERENCE_VENV = Path("/tmp/ensabc-m0-baseline")
-DATA_VENV = Path("/tmp/ensabc-m0-data/.venv")
+REFERENCE_VENV = Path(os.environ.get("ENSABC_M0_REFERENCE_VENV") or "/tmp/ensabc-m0-baseline")
+DATA_VENV = Path(os.environ.get("ENSABC_M0_DATA_VENV") or "/tmp/ensabc-m0-data/.venv")
 DATA_PYTHON = DATA_VENV / "bin" / "python"
 
 EXIT_PASSED = 0
@@ -213,6 +214,8 @@ def step_sample(run_dir: Path) -> StepOutcome:
     failure to reach the source is reported as a blocked step rather than as a
     pass.
     """
+    if not DATA_PYTHON.is_file():
+        return StepOutcome("not_run", f"the locked data environment is missing at {DATA_VENV}")
     if not PAYLOAD_PATH.is_file():
         rebuild = run_script(
             [
@@ -234,7 +237,7 @@ def step_sample(run_dir: Path) -> StepOutcome:
     output_path = run_dir / "sample-validation.json"
     completed = run_script(
         [
-            sys.executable,
+            str(DATA_PYTHON),
             str(VALIDATION_DIR / "verify_sample.py"),
             "--offline",
             "--output",
@@ -261,10 +264,12 @@ def step_sample_recovery(run_dir: Path) -> StepOutcome:
     one is possible. When the source cannot be reached the step is recorded as
     `not_run`, never as a pass.
     """
+    if not DATA_PYTHON.is_file():
+        return StepOutcome("not_run", f"the locked data environment is missing at {DATA_VENV}")
     output_path = run_dir / "sample-recovery.json"
     completed = run_script(
         [
-            sys.executable,
+            str(DATA_PYTHON),
             str(VALIDATION_DIR / "verify_sample_recovery.py"),
             "--output",
             str(output_path),
@@ -541,7 +546,7 @@ def build_requirement_records(
     mapping: dict[str, list[str]] = {
         "FR-001": ["sample"],
         "FR-002": ["sample"],
-        "FR-003": ["sample"],
+        "FR-003": ["sample", "sample_recovery"],
         "FR-004": ["reference"],
         "FR-005": ["reference", "comparator_self_check"],
         "FR-006": ["extension"],
@@ -680,7 +685,6 @@ def main() -> int:
     record("sample", step_sample(run_dir))
     record("sample_recovery", step_sample_recovery(run_dir))
     record("reference", step_reference(run_dir))
-    record("independent_reproduction", step_independent_reproduction(run_dir))
     record("comparator_self_check", step_comparator_self_check(run_dir))
     record("build_extension", step_build_extension(run_dir))
 
@@ -690,6 +694,7 @@ def main() -> int:
         extension = Path(build_outcome.extra["extension_path"])
 
     record("extension", step_extension(run_dir, extension))
+    record("independent_reproduction", step_independent_reproduction(run_dir))
     record("measurements", step_measurements(run_dir, extension))
     if arguments.skip_minimal_runtime:
         record(
@@ -806,30 +811,45 @@ def main() -> int:
     )
     traceability_detail = (traceability.stdout + traceability.stderr).strip()
     traceability_status = "not_run"
+    traceability_record: dict[str, Any] = {}
     if traceability_path.is_file():
-        traceability_record = read_json(traceability_path)
-        traceability_status = traceability_record.get("status", "not_run")
+        try:
+            traceability_record = read_json(traceability_path)
+            traceability_status = traceability_record.get("status", "not_run")
+        except (OSError, ValueError, M0Error) as error:
+            traceability_detail += f"; unreadable traceability record: {error}"
+    if traceability_status not in ("pass", "fail", "not_run"):
+        traceability_status = "not_run"
+    if traceability_status == "pass" and traceability.returncode != 0:
+        traceability_status = "not_run"
+    report["traceability"] = {
+        "status": traceability_status,
+        "failed_assertions": traceability_record.get("failed_assertions", []),
+        "failed_success_criterion_assertions": traceability_record.get("failed_success_criterion_assertions", []),
+    }
     if traceability_status != "pass":
-        print(f"  [FAIL] traceability: {traceability_detail.splitlines()[0] if traceability_detail else ''}")
-        if traceability_status == "not_run":
-            print("M0 gate: incomplete")
-            print(f"  report: {report_path}")
-            return EXIT_INCOMPLETE
-        # The report claims more than the evidence supports. The report is
-        # corrected to record the disagreement rather than left standing.
-        for requirement_id, record in requirements.items():
-            if record["status"] == "pass" and traceability_record["matrix"][requirement_id]["status"] != "pass":
-                record["status"] = "fail"
-                record["limitations"].append(
-                    "the traceability matrix does not support this verdict: "
-                    f"{traceability_record['matrix'][requirement_id]['failed_assertions']}"
-                )
-        overall = aggregate_overall(requirements)
-        report["overall"] = overall
+        marker = "SKIP" if traceability_status == "not_run" else "FAIL"
+        print(f"  [{marker}] traceability: {traceability_detail.splitlines()[0] if traceability_detail else ''}")
+        # Correct only FR verdicts contradicted by their own evidence. SC-only
+        # failures belong to the report-level gate, not an unrelated FR.
+        if traceability_status == "fail":
+            for requirement_id, record in requirements.items():
+                derived = traceability_record.get("matrix", {}).get(requirement_id, {})
+                if record["status"] == "pass" and derived.get("status") == "fail":
+                    record["status"] = "fail"
+                    record["limitations"].append(
+                        "the traceability matrix does not support this verdict: "
+                        f"{derived.get('failed_assertions', [])}"
+                    )
+        failures = report["traceability"]["failed_assertions"] + report["traceability"]["failed_success_criterion_assertions"]
         report["limitations"] = sorted(
-            set(report["limitations"]) | {f"traceability: {entry}" for entry in traceability_record.get("failed_assertions", [])}
+            set(report["limitations"]) | {f"traceability: {entry}" for entry in failures}
+            | ({f"traceability evidence is incomplete: {traceability_detail}"} if traceability_status == "not_run" else set())
         )
-        write_json(report_path, report)
+    overall = aggregate_overall(requirements, traceability_status)
+    report["overall"] = overall
+    validate_gate_report(report)
+    write_json(report_path, report)
 
     counts = {
         status: sum(1 for record in requirements.values() if record["status"] == status)

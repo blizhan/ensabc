@@ -49,8 +49,8 @@ use duckdb::ffi::{
     duckdb_scalar_function_set_function, duckdb_scalar_function_set_name,
     duckdb_scalar_function_set_return_type, duckdb_scalar_function_set_special_handling,
     duckdb_string_t, duckdb_string_t_data, duckdb_string_t_length, duckdb_struct_vector_get_child,
-    duckdb_validity_row_is_valid, duckdb_vector, duckdb_vector_get_data, duckdb_vector_get_validity,
-    duckdb_vector_reference_vector,
+    duckdb_validity_row_is_valid, duckdb_vector, duckdb_vector_get_data,
+    duckdb_vector_get_validity, duckdb_vector_reference_vector,
 };
 
 /// The name the function is registered under.
@@ -296,27 +296,30 @@ unsafe extern "C" fn echo_callback(
 
 /// Build the `STRUCT(member_id VARCHAR, features DOUBLE[])[]` logical type.
 fn build_members_type() -> duckdb::ffi::duckdb_logical_type {
-    // SAFETY: the logical types are created by DuckDB and immediately handed
-    // to DuckDB, which takes ownership of the nested types.
+    // SAFETY: DuckDB copies child types into their parents, so each temporary
+    // handle is destroyed after its last use.
     unsafe {
-        let varchar = duckdb_create_logical_type(DUCKDB_TYPE_DUCKDB_TYPE_VARCHAR);
-        let double = duckdb_create_logical_type(DUCKDB_TYPE_DUCKDB_TYPE_DOUBLE);
-        let feature_list = duckdb_create_list_type(double);
+        let mut varchar = duckdb_create_logical_type(DUCKDB_TYPE_DUCKDB_TYPE_VARCHAR);
+        let mut double = duckdb_create_logical_type(DUCKDB_TYPE_DUCKDB_TYPE_DOUBLE);
+        let mut feature_list = duckdb_create_list_type(double);
+        duckdb::ffi::duckdb_destroy_logical_type(&mut double);
 
         let mut member_types = [varchar, feature_list];
         let member_id_name = CString::new("member_id").expect("no NUL in the member name");
         let features_name = CString::new("features").expect("no NUL in the member name");
         let mut member_names = [member_id_name.as_ptr(), features_name.as_ptr()];
 
-        let member_struct = duckdb_create_struct_type(
+        let mut member_struct = duckdb_create_struct_type(
             member_types.as_mut_ptr(),
             member_names.as_mut_ptr(),
             member_types.len() as u64,
         );
 
-        // The struct and the inner list type are owned by the struct type, so
-        // only the outer list type is destroyed by the caller.
-        duckdb_create_list_type(member_struct)
+        duckdb::ffi::duckdb_destroy_logical_type(&mut varchar);
+        duckdb::ffi::duckdb_destroy_logical_type(&mut feature_list);
+        let members = duckdb_create_list_type(member_struct);
+        duckdb::ffi::duckdb_destroy_logical_type(&mut member_struct);
+        members
     }
 }
 
@@ -330,13 +333,13 @@ unsafe fn register(connection: duckdb::ffi::duckdb_connection) -> Result<(), Str
     // call below operates on handles that this function creates and destroys.
     unsafe {
         let name = CString::new(FUNCTION_NAME).expect("no NUL in the function name");
-        let function = duckdb_create_scalar_function();
+        let mut function = duckdb_create_scalar_function();
         duckdb_scalar_function_set_name(function, name.as_ptr());
 
-        let members_type = build_members_type();
+        let mut members_type = build_members_type();
         duckdb_scalar_function_add_parameter(function, members_type);
         duckdb_scalar_function_set_return_type(function, members_type);
-        duckdb::ffi::duckdb_destroy_logical_type(ptr::from_ref(&members_type).cast_mut());
+        duckdb::ffi::duckdb_destroy_logical_type(&mut members_type);
 
         // The critical difference from the default null handling: a NULL
         // argument is delivered to the callback instead of being folded into a
@@ -345,7 +348,7 @@ unsafe fn register(connection: duckdb::ffi::duckdb_connection) -> Result<(), Str
         duckdb_scalar_function_set_function(function, Some(echo_callback));
 
         let state = duckdb_register_scalar_function(connection, function);
-        duckdb_destroy_scalar_function(ptr::from_ref(&function).cast_mut());
+        duckdb_destroy_scalar_function(&mut function);
         if state != DuckDBSuccess {
             return Err(format!(
                 "failed to register {FUNCTION_NAME} on the extension connection"
@@ -372,13 +375,12 @@ pub unsafe extern "C" fn ensabc_m0_extension_init_c_api(
     access: *const duckdb::ffi::duckdb_extension_access,
 ) -> bool {
     let init = || -> Result<(), String> {
-        let have_api = unsafe {
-            duckdb::ffi::duckdb_rs_extension_api_init(info, access, MIN_DUCKDB_VERSION)
-        }
-        .map_err(|message| message.to_string())?;
+        let have_api =
+            unsafe { duckdb::ffi::duckdb_rs_extension_api_init(info, access, MIN_DUCKDB_VERSION) }
+                .map_err(|message| message.to_string())?;
         if !have_api {
             return Err(
-                "the DuckDB C API could not be initialized for this extension version".to_string()
+                "the DuckDB C API could not be initialized for this extension version".to_string(),
             );
         }
 
@@ -398,7 +400,7 @@ pub unsafe extern "C" fn ensabc_m0_extension_init_c_api(
 
         let registration = unsafe { register(connection) };
         unsafe {
-            duckdb::ffi::duckdb_disconnect(ptr::from_ref(&connection).cast_mut());
+            duckdb::ffi::duckdb_disconnect(&mut connection);
         }
         registration
     };

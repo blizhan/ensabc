@@ -45,8 +45,8 @@ MANIFEST_PATH = FIXTURES_DIR / "real_ifs_ens_20200101_t2m_manifest.json"
 PAYLOAD_PATH = FIXTURES_DIR / "real_ifs_ens_20200101_t2m_data.json"
 CONFIG_PATH = FIXTURES_DIR / "reference_config.json"
 
-DATA_VENV = Path("/tmp/ensabc-m0-data/.venv")
-REFERENCE_VENV = Path("/tmp/ensabc-m0-baseline")
+DATA_VENV = Path(os.environ.get("ENSABC_M0_DATA_VENV") or "/tmp/ensabc-m0-data/.venv")
+REFERENCE_VENV = Path(os.environ.get("ENSABC_M0_REFERENCE_VENV") or "/tmp/ensabc-m0-baseline")
 
 # The identity of the sample that both sides must produce. It is the
 # float32 source matrix hash, which does not depend on when the sample was
@@ -225,12 +225,6 @@ def compare_with_baseline(workdir: Path, baseline_run: Path | None) -> dict[str,
     differences: list[str] = []
     notes: list[str] = []
 
-    sample = read_json(workdir / "sample-validation.json")
-    if sample.get("matrix_sha256_float32_le") != EXPECTED_SOURCE_MATRIX_SHA256:
-        differences.append(
-            "the reproduced source matrix hash differs from the recorded one"
-        )
-
     if baseline_run is None:
         return {
             "status": "not_run",
@@ -238,40 +232,53 @@ def compare_with_baseline(workdir: Path, baseline_run: Path | None) -> dict[str,
             "notes": ["no recorded run was given to compare against"],
         }
 
-    baseline_sample_path = baseline_run / "sample-validation.json"
-    if baseline_sample_path.is_file():
-        baseline_sample = read_json(baseline_sample_path)
-        if baseline_sample.get("matrix_sha256_float32_le") != sample.get("matrix_sha256_float32_le"):
-            differences.append(
-                "the reproduced source matrix hash differs from the recorded run's"
-            )
-        if baseline_sample.get("sample_id") != sample.get("sample_id"):
-            differences.append("the reproduced sample has a different sample id")
-        notes.append("the sample was compared with the recorded run")
+    required = (
+        workdir / "sample-validation.json",
+        baseline_run / "sample-validation.json",
+        workdir / "reference" / "summary.json",
+        baseline_run / "reference" / "reference-summary.json",
+        workdir / "exchange.json",
+        baseline_run / "exchange.json",
+    )
+    missing = [str(path) for path in required if not path.is_file()]
+    if missing:
+        return {
+            "status": "not_run",
+            "differences": [],
+            "notes": [f"required comparison evidence is missing: {path}" for path in missing],
+        }
 
-    summary_path = workdir / "reference" / "summary.json"
-    baseline_summary_path = baseline_run / "reference" / "reference-summary.json"
-    if summary_path.is_file() and baseline_summary_path.is_file():
-        summary = read_json(summary_path)
-        baseline_summary = read_json(baseline_summary_path)
-        if summary.get("input_sha256") != baseline_summary.get("input_sha256"):
-            differences.append("the reproduced reference used a different input")
-        if summary.get("config_sha256") != baseline_summary.get("config_sha256"):
-            differences.append("the reproduced reference used a different configuration")
-        if summary["runs"][0]["labels"] != baseline_summary["runs"][0]["labels"]:
-            differences.append("the reproduced member partition differs from the recorded one")
-        notes.append("the reference partition was compared with the recorded run")
+    sample = read_json(workdir / "sample-validation.json")
+    if sample.get("matrix_sha256_float32_le") != EXPECTED_SOURCE_MATRIX_SHA256:
+        differences.append("the reproduced source matrix hash differs from the recorded one")
 
-    exchange_path = workdir / "exchange.json"
-    baseline_exchange_path = baseline_run / "exchange.json"
-    if exchange_path.is_file() and baseline_exchange_path.is_file():
-        exchange = read_json(exchange_path)
-        baseline_exchange = read_json(baseline_exchange_path)
-        if exchange.get("illegal_categories_covered") != baseline_exchange.get(
-            "illegal_categories_covered"
-        ):
-            differences.append("the reproduced illegal categories differ from the recorded ones")
-        notes.append("the extension coverage was compared with the recorded run")
+    baseline_sample = read_json(baseline_run / "sample-validation.json")
+    if baseline_sample.get("matrix_sha256_float32_le") != sample.get("matrix_sha256_float32_le"):
+        differences.append("the reproduced source matrix hash differs from the recorded run's")
+    if baseline_sample.get("sample_id") != sample.get("sample_id"):
+        differences.append("the reproduced sample has a different sample id")
+    notes.append("the sample was compared with the recorded run")
+
+    summary = read_json(workdir / "reference" / "summary.json")
+    baseline_summary = read_json(baseline_run / "reference" / "reference-summary.json")
+    if summary.get("input_sha256") != baseline_summary.get("input_sha256"):
+        differences.append("the reproduced reference used a different input")
+    if summary.get("config_sha256") != baseline_summary.get("config_sha256"):
+        differences.append("the reproduced reference used a different configuration")
+    if summary["runs"][0]["labels"] != baseline_summary["runs"][0]["labels"]:
+        differences.append("the reproduced member partition differs from the recorded one")
+    notes.append("the reference partition was compared with the recorded run")
+
+    exchange = read_json(workdir / "exchange.json")
+    baseline_exchange = read_json(baseline_run / "exchange.json")
+    if exchange.get("illegal_categories_covered") != baseline_exchange.get("illegal_categories_covered"):
+        differences.append("the reproduced illegal categories differ from the recorded ones")
+    if not exchange.get("illegal_categories_covered") or not baseline_exchange.get("illegal_categories_covered"):
+        differences.append("the extension coverage evidence is empty")
+    for label, record in (("reproduced sample", sample), ("baseline sample", baseline_sample), ("reproduced reference", summary), ("baseline reference", baseline_summary), ("reproduced extension", exchange), ("baseline extension", baseline_exchange)):
+        if record.get("status") != "pass":
+            differences.append(f"the {label} did not pass its own validation")
+    notes.append("the extension coverage was compared with the recorded run")
 
     return {
         "status": "pass" if not differences else "fail",

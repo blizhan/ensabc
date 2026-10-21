@@ -42,9 +42,13 @@ DuckDB 宿主与扩展 ABI 类型、扩展依赖版本、参考与数据环境�
 下列命令重建出逐字节相同的载荷：
 
 ```bash
-/tmp/ensabc-m0-data/.venv/bin/python \
-  validation/m0/extract_sample.py --rebuild --from-source
+"${ENSABC_M0_DATA_VENV:-/tmp/ensabc-m0-data/.venv}/bin/python" \
+  validation/m0/extract_sample.py --rebuild --from-source --force
 ```
+
+`--force` 允许在重建载荷时重新生成仓库已提交的 manifest；源矩阵身份和预期
+哈希仍由提取器检查。数据环境路径与 `setup_env.sh` 的 `ENSABC_M0_DATA_VENV`
+覆盖值保持一致，后续样本核验同样使用该环境中的解释器。
 
 预期：`sample_id` 为 `ifs_ens_20200101_t2m_50x9`，形状 `[50, 9]`，载荷
 SHA-256 为 `ae8f0349cc1c6cf189e1757c454163a5ec550dc5768b50c03cb9adf34f7baa64`。
@@ -54,7 +58,8 @@ SHA-256 为 `ae8f0349cc1c6cf189e1757c454163a5ec550dc5768b50c03cb9adf34f7baa64`�
 离线核验（不需要网络）：
 
 ```bash
-python3 validation/m0/verify_sample.py --offline
+"${ENSABC_M0_DATA_VENV:-/tmp/ensabc-m0-data/.venv}/bin/python" \
+  validation/m0/verify_sample.py --offline
 ```
 
 预期：`PASS offline sample verification`，50 个成员、9 个有序网格点、
@@ -64,7 +69,8 @@ python3 validation/m0/verify_sample.py --offline
 从源回源恢复（核对源对象 generation 未变，并重新提取后与冻结副本逐字节比较）：
 
 ```bash
-python3 validation/m0/verify_sample_recovery.py
+"${ENSABC_M0_DATA_VENV:-/tmp/ensabc-m0-data/.venv}/bin/python" \
+  validation/m0/verify_sample_recovery.py
 ```
 
 预期：`sample recovery: pass`，7 个源对象 generation 一致，重新提取的 CSV

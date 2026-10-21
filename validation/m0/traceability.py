@@ -33,7 +33,7 @@ from typing import Any, Callable
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from common import REPO_ROOT, M0Error, read_json  # noqa: E402
-from schema import REQUIREMENT_IDS, SUCCESS_CRITERION_IDS  # noqa: E402
+from schema import REQUIREMENT_IDS, SUCCESS_CRITERION_IDS, aggregate_overall  # noqa: E402
 
 SCHEMA_VERSION = "m0.traceability.v1"
 
@@ -204,6 +204,46 @@ class Evidence:
             else:
                 raise KeyError(f"the path {path!r} does not resolve in {document}")
         return value
+
+    def unavailable_reason(self, assertion: Assertion) -> str | None:
+        """Only an explicitly unexecuted producer makes its evidence unavailable.
+
+        Missing evidence from a producer that claimed success remains a failure.
+        Existing output from an unexecuted step is not accepted as current evidence.
+        """
+        document = assertion.path.rpartition(":")[0]
+        producer = {
+            "sample-validation.json": "sample",
+            "sample-recovery.json": "sample_recovery",
+            "environment.json": "environment",
+            "source-hashes.json": "environment",
+            "exchange.json": "extension",
+            "measurements.json": "measurements",
+            "minimal-runtime.json": "minimal_runtime",
+            "independent-reproduction.json": "independent_reproduction",
+            "reference/comparator-self-check.json": "comparator_self_check",
+            "reference/reference-summary.json": "reference",
+            "reference/comparison.json": "reference",
+            "reference/run-1.json": "reference",
+        }.get(document)
+        if producer:
+            try:
+                step = self._load("steps.json").get(producer, {})
+            except KeyError:
+                step = {}
+            if step.get("status") == "not_run":
+                return f"the {producer} step was not run: {step.get('detail', '')}"
+            try:
+                record = self._load(document)
+            except KeyError:
+                record = {}
+            if record.get("status") == "not_run":
+                return f"the evidence producer recorded not_run: {document}"
+        if assertion.assertion_id in ("SC006-2", "SC006-3"):
+            requirements = self.lookup("report.json:requirements")
+            if aggregate_overall(requirements) == "incomplete":
+                return "the required steps are incomplete"
+        return None
 
 
 def A(  # noqa: N802 - a short constructor keeps the matrix readable
@@ -551,37 +591,47 @@ def _attach_custom_checks() -> None:
 _attach_custom_checks()
 
 
+def _evaluate_assertions(assertions: list[Assertion], evidence: Evidence) -> dict[str, Any]:
+    results = []
+    for assertion in assertions:
+        try:
+            reason = evidence.unavailable_reason(assertion)
+            if reason is not None:
+                holds, observed, status = False, reason, "not_run"
+            else:
+                holds, observed = assertion.evaluate(evidence)
+                status = "pass" if holds else "fail"
+        except (KeyError, M0Error) as error:
+            holds, observed, status = False, f"the assertion could not be evaluated: {error}", "fail"
+        results.append({
+            "assertion_id": assertion.assertion_id,
+            "description": assertion.description,
+            "evidence_path": assertion.path,
+            "expected": assertion.expected,
+            "operator": assertion.operator,
+            "observed": observed,
+            "holds": holds,
+            "status": status,
+        })
+    failures = [result for result in results if result["status"] == "fail"]
+    pending = [result for result in results if result["status"] == "not_run"]
+    return {
+        "assertion_count": len(results),
+        "status": "fail" if failures or not results else "not_run" if pending else "pass",
+        "failed_assertions": [result["assertion_id"] for result in failures],
+        "not_run_assertions": [result["assertion_id"] for result in pending],
+        "assertions": results,
+    }
+
+
 def run_traceability(run_dir: Path) -> dict[str, Any]:
     """Evaluate the matrix against the evidence in `run_dir`."""
     evidence = Evidence(run_dir)
 
-    matrix: dict[str, Any] = {}
-    for requirement_id in REQUIREMENT_IDS:
-        assertions = MATRIX.get(requirement_id, [])
-        results = []
-        for assertion in assertions:
-            try:
-                holds, observed = assertion.evaluate(evidence)
-            except M0Error as error:
-                holds, observed = False, f"the assertion could not be evaluated: {error}"
-            results.append(
-                {
-                    "assertion_id": assertion.assertion_id,
-                    "description": assertion.description,
-                    "evidence_path": assertion.path,
-                    "expected": assertion.expected,
-                    "operator": assertion.operator,
-                    "observed": observed,
-                    "holds": holds,
-                }
-            )
-        failures = [result for result in results if not result["holds"]]
-        matrix[requirement_id] = {
-            "assertion_count": len(results),
-            "status": "pass" if results and not failures else "fail",
-            "failed_assertions": [result["assertion_id"] for result in failures],
-            "assertions": results,
-        }
+    matrix = {
+        requirement_id: _evaluate_assertions(MATRIX.get(requirement_id, []), evidence)
+        for requirement_id in REQUIREMENT_IDS
+    }
 
     # Forward coverage: every requirement is accounted for.
     uncovered = [rid for rid in REQUIREMENT_IDS if not MATRIX.get(rid)]
@@ -600,33 +650,10 @@ def run_traceability(run_dir: Path) -> dict[str, Any]:
     orphaned = sorted(defined - referenced)
 
     # The success criteria are evaluated with the same machinery.
-    sc_matrix: dict[str, Any] = {}
-    for criterion_id in SUCCESS_CRITERION_IDS:
-        assertions = SC_MATRIX.get(criterion_id, [])
-        results = []
-        for assertion in assertions:
-            try:
-                holds, observed = assertion.evaluate(evidence)
-            except M0Error as error:
-                holds, observed = False, f"the assertion could not be evaluated: {error}"
-            results.append(
-                {
-                    "assertion_id": assertion.assertion_id,
-                    "description": assertion.description,
-                    "evidence_path": assertion.path,
-                    "expected": assertion.expected,
-                    "operator": assertion.operator,
-                    "observed": observed,
-                    "holds": holds,
-                }
-            )
-        failures = [result for result in results if not result["holds"]]
-        sc_matrix[criterion_id] = {
-            "assertion_count": len(results),
-            "status": "pass" if results and not failures else "fail",
-            "failed_assertions": [result["assertion_id"] for result in failures],
-            "assertions": results,
-        }
+    sc_matrix = {
+        criterion_id: _evaluate_assertions(SC_MATRIX.get(criterion_id, []), evidence)
+        for criterion_id in SUCCESS_CRITERION_IDS
+    }
 
     uncovered_criteria = [sc for sc in SUCCESS_CRITERION_IDS if not SC_MATRIX.get(sc)]
 
@@ -654,13 +681,13 @@ def run_traceability(run_dir: Path) -> dict[str, Any]:
         result
         for requirement in matrix.values()
         for result in requirement["assertions"]
-        if not result["holds"]
+        if result["status"] == "fail"
     ]
     sc_failures = [
         result
         for criterion in sc_matrix.values()
         for result in criterion["assertions"]
-        if not result["holds"]
+        if result["status"] == "fail"
     ]
 
     status = "pass"
@@ -673,6 +700,8 @@ def run_traceability(run_dir: Path) -> dict[str, Any]:
         or consistency["mismatches"]
     ):
         status = "fail"
+    elif any(entry["status"] == "not_run" for entry in (*matrix.values(), *sc_matrix.values())):
+        status = "not_run"
 
     return {
         "schema_version": SCHEMA_VERSION,
@@ -710,6 +739,12 @@ def run_traceability(run_dir: Path) -> dict[str, Any]:
                 "observed": result["observed"],
             }
             for result in sc_failures
+        ],
+        "not_run_assertions": [
+            result["assertion_id"]
+            for entry in (*matrix.values(), *sc_matrix.values())
+            for result in entry["assertions"]
+            if result["status"] == "not_run"
         ],
         "matrix": matrix,
         "success_criteria": sc_matrix,
@@ -751,11 +786,11 @@ def main() -> int:
     )
     for requirement_id in REQUIREMENT_IDS:
         entry = result["matrix"][requirement_id]
-        marker = "ok  " if entry["status"] == "pass" else "FAIL"
+        marker = {"pass": "ok  ", "fail": "FAIL", "not_run": "SKIP"}[entry["status"]]
         print(f"  [{marker}] {requirement_id}: {entry['assertion_count']} assertion(s)")
     for criterion_id in SUCCESS_CRITERION_IDS:
         entry = result["success_criteria"][criterion_id]
-        marker = "ok  " if entry["status"] == "pass" else "FAIL"
+        marker = {"pass": "ok  ", "fail": "FAIL", "not_run": "SKIP"}[entry["status"]]
         print(f"  [{marker}] {criterion_id}: {entry['assertion_count']} assertion(s)")
     for failure in result["failed_assertions"]:
         print(
@@ -767,9 +802,11 @@ def main() -> int:
             f"  FAILED {failure['assertion_id']}: {failure['description']} "
             f"(expected {failure['expected']!r}, observed {failure['observed']!r})"
         )
+    for assertion_id in result["not_run_assertions"]:
+        print(f"  NOT RUN {assertion_id}: required evidence is unavailable")
     for mismatch in result["consistency_with_report"]["mismatches"]:
         print(f"  MISMATCH: {mismatch}")
-    return 0 if result["status"] == "pass" else 1
+    return {"pass": 0, "fail": 1, "not_run": 2}[result["status"]]
 
 
 if __name__ == "__main__":

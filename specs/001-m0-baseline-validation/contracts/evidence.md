@@ -33,10 +33,19 @@ report.json
 | `created_at` | UTC 时间 |
 | `overall` | `passed`、`failed`、`incomplete` |
 | `requirements` | FR-001 至 FR-014，各出现一次 |
+| `traceability` | 证据门禁状态 `pass` / `fail` / `not_run`，以及失败的 FR / SC 断言明细；正式驱动在复核后写入 |
 | `limitations` | 未覆盖平台、范围及限制 |
 | `m1_handoff` | 样本、参考配置、比较规则、版本组合和依赖决策的文档引用 |
 
 每项 requirement 包含 [验证契约](validation.md) 的记录字段。可以由多个案例聚合；任一必要案例失败即该项失败，任何必要案例未运行且无失败则为未执行。总体有失败为 `failed`，无失败但有未执行为 `incomplete`，全部满足才为 `passed`。FR-014 检查报告完整性、引用可解析及聚合规则，不要求报告内容“都是通过”才认为报告结构正确。
+
+总体还必须计入 `traceability.status`：任何 FR 或 SC 证据断言失败使总体为
+`failed`，复核未执行且没有其他失败时为 `incomplete`。SC 单独失败时保留真实的
+FR 状态，不把该失败挂到不相关的 FR 上。旧报告可以不含该顶层字段；新的正式
+驱动始终写入，并保留 `traceability.json` 的断言明细。traceability 区分断言的
+`pass` / `fail` / `not_run`：步骤明确未执行时，其证据断言及依赖整体通过的
+SC 前置条件记为 `not_run`；声称已执行的步骤缺少证据仍记为失败。其他已执行
+断言的具体失败优先于未执行状态，不会被同时存在的缺证据掩盖。
 
 正式驱动程序返回码：`0` 仅代表整体 `passed`，`1` 为验证失败，`2` 为证据不完整或执行条件未满足。日志打印不能替代结构化状态。
 

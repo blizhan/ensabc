@@ -44,6 +44,9 @@ SOURCE_HASH_TARGETS = (
     "validation/m0/verify_report.py",
     "validation/m0/traceability.py",
     "validation/m0/verify_sample_recovery.py",
+    "validation/m0/reproduce_independently.py",
+    "validation/m0/verify_minimal_runtime.sh",
+    "validation/m0/minimal_runtime_cases.py",
     "crates/ensabc-duckdb/Cargo.toml",
     "crates/ensabc-duckdb/src/lib.rs",
 )

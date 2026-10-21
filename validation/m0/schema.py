@@ -377,6 +377,16 @@ def validate_gate_report(report: Any) -> dict[str, Any]:
         f"{context}: overall must be one of {OVERALL_STATUSES}",
     )
 
+    traceability = report.get("traceability")
+    if "traceability" in report:
+        _require(isinstance(traceability, dict), f"{context}: traceability must be an object")
+        _require(
+            traceability.get("status") in REQUIREMENT_STATUSES,
+            f"{context}: traceability.status must be one of {REQUIREMENT_STATUSES}",
+        )
+        for key in ("failed_assertions", "failed_success_criterion_assertions"):
+            _require(isinstance(traceability.get(key), list), f"{context}: traceability.{key} must be a list")
+
     requirements = report.get("requirements")
     _require(isinstance(requirements, dict), f"{context}: requirements must be an object")
     for requirement_id in REQUIREMENT_IDS:
@@ -419,14 +429,16 @@ def validate_gate_report(report: Any) -> dict[str, Any]:
     }
 
 
-def aggregate_overall(requirements: dict[str, Any]) -> str:
-    """Derive the overall status from the per-requirement statuses.
+def aggregate_overall(requirements: dict[str, Any], traceability_status: str | None = None) -> str:
+    """Derive the overall status from requirements and the evidence gate.
 
     A single failure makes the overall result `failed`. Otherwise a single
     unexecuted requirement makes it `incomplete`. Only an all-pass set yields
     `passed`. This mirrors [contracts/evidence.md](../specs/001-m0-baseline-validation/contracts/evidence.md).
     """
     statuses = [record["status"] for record in requirements.values()]
+    if traceability_status is not None:
+        statuses.append(traceability_status)
     if "fail" in statuses:
         return "failed"
     if "not_run" in statuses:

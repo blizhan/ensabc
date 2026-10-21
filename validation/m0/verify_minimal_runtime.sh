@@ -124,29 +124,17 @@ fi
 
 cp "$EXTENSION" "$RUNTIME_DIR/root/opt/ensabc_m0_extension.duckdb_extension"
 
-cat > "$RUNTIME_DIR/root/tmp/cases.sql" <<'SQL'
-.bail off
-LOAD '/runtime/opt/ensabc_m0_extension.duckdb_extension';
-
--- A legal task must roundtrip.
-SELECT 'positive' AS stage, ens_m0_echo([{'member_id': 'ok', 'features': [1.0, 2.0]}]) AS echoed;
-
--- An illegal task must fail with a located reason.
-SELECT 'illegal-null' AS stage, ens_m0_echo([{'member_id': 'ok', 'features': [NULL]}]) AS echoed;
-
--- The same session must still accept a legal task.
-SELECT 'recovery' AS stage, ens_m0_echo([{'member_id': 'ok', 'features': [3.0]}]) AS echoed;
-
--- A top-level NULL must fail as well.
-SELECT 'illegal-top-level' AS stage, ens_m0_echo(NULL::STRUCT(member_id VARCHAR, features DOUBLE[])[]) AS echoed;
-
-SELECT 'recovery-2' AS stage, ens_m0_echo([{'member_id': 'ok', 'features': [4.0]}]) AS echoed;
-SQL
+# Python only prepares/checks files on the host. The container receives SQL
+# and a shell runner, never the Python reference stack.
+python3 "$ROOT/validation/m0/minimal_runtime_cases.py" prepare "$RUNTIME_DIR/root/tmp"
+mkdir -p "$RUNTIME_DIR/results"
 
 # --- run the isolated environment ----------------------------------------------
 
-echo "pulling $BASE_IMAGE"
-docker pull "$BASE_IMAGE" >/dev/null
+if ! docker image inspect "$BASE_IMAGE" >/dev/null 2>&1; then
+    echo "pulling $BASE_IMAGE"
+    docker pull "$BASE_IMAGE" >/dev/null
+fi
 
 docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
 
@@ -156,6 +144,7 @@ docker run --rm \
     --name "$CONTAINER_NAME" \
     --platform linux/arm64 \
     -v "$RUNTIME_DIR/root:/runtime:ro" \
+    -v "$RUNTIME_DIR/results:/results" \
     "$BASE_IMAGE" \
     /bin/sh -c '
         set -e
@@ -172,8 +161,15 @@ docker run --rm \
         echo "=== dynamic libraries of the extension ==="
         ldd /runtime/opt/ensabc_m0_extension.duckdb_extension 2>&1 || true
         echo "=== the SQL cases ==="
-        /runtime/usr/local/bin/duckdb -unsigned :memory: -init /dev/null < /runtime/tmp/cases.sql
-    ' > "$RUNTIME_DIR/minimal-runtime-output.txt" 2>&1 || true
+        /runtime/usr/local/bin/duckdb -unsigned :memory: -init /dev/null < /runtime/tmp/cases.sql > /results/cases.txt 2>&1 || true
+        cat /results/cases.txt
+        /runtime/usr/local/bin/duckdb -unsigned :memory: -init /dev/null < /runtime/tmp/concurrent.sql > /results/concurrent-1.txt 2>&1 &
+        first=$!
+        /runtime/usr/local/bin/duckdb -unsigned :memory: -init /dev/null < /runtime/tmp/concurrent.sql > /results/concurrent-2.txt 2>&1 &
+        second=$!
+        wait "$first"
+        wait "$second"
+    ' > "$RUNTIME_DIR/minimal-runtime-output.txt" 2>&1 && CONTAINER_STATUS=0 || CONTAINER_STATUS=$?
 
 OUTPUT="$RUNTIME_DIR/minimal-runtime-output.txt"
 cat "$OUTPUT"
@@ -183,37 +179,19 @@ cat "$OUTPUT"
 STATUS="pass"
 REASONS=()
 
-if ! grep -q "ABSENT:  python3" "$OUTPUT"; then
+if [[ "$CONTAINER_STATUS" != "0" ]]; then
     STATUS="fail"
-    REASONS+=("python3 is present in the minimal runtime")
+    REASONS+=("the isolated runner failed with exit code $CONTAINER_STATUS")
 fi
-if ! grep -q "ABSENT:  cdo" "$OUTPUT"; then
+for tool in python3 python cdo wgrib wgrib2 gfortran R Rscript; do
+    if ! grep -Fxq "ABSENT:  $tool" "$OUTPUT"; then
+        STATUS="fail"
+        REASONS+=("$tool absence was not demonstrated in the minimal runtime")
+    fi
+done
+if ! python3 "$ROOT/validation/m0/minimal_runtime_cases.py" check "$RUNTIME_DIR/results"; then
     STATUS="fail"
-    REASONS+=("cdo is present in the minimal runtime")
-fi
-if ! grep -q "ABSENT:  wgrib" "$OUTPUT"; then
-    STATUS="fail"
-    REASONS+=("wgrib is present in the minimal runtime")
-fi
-if ! grep -q "ABSENT:  wgrib2" "$OUTPUT"; then
-    STATUS="fail"
-    REASONS+=("wgrib2 is present in the minimal runtime")
-fi
-if ! grep -q "positive" "$OUTPUT"; then
-    STATUS="fail"
-    REASONS+=("the positive case did not run")
-fi
-if ! grep -q "recovery" "$OUTPUT"; then
-    STATUS="fail"
-    REASONS+=("the recovery case did not run")
-fi
-if ! grep -q "the feature value is NULL" "$OUTPUT"; then
-    STATUS="fail"
-    REASONS+=("the nested NULL case was not rejected with the expected reason")
-fi
-if ! grep -q "the members list of task row 0 is NULL" "$OUTPUT"; then
-    STATUS="fail"
-    REASONS+=("the top-level NULL case was not rejected with the expected reason")
+    REASONS+=("the exact roundtrip, all-category rejection, recovery, batch or concurrency checks failed")
 fi
 
 # The extension must not link against any reference tool.

@@ -145,7 +145,9 @@ def check_manifest_and_payload(manifest_path: Path, payload_path: Path) -> dict[
     if not payload_path.is_file():
         _fail(
             f"frozen sample payload is missing: {payload_path}. "
-            "Rebuild it with `python3 validation/m0/extract_sample.py --rebuild`."
+            "Rebuild it with the setup_env.sh data interpreter: "
+            "`\"${ENSABC_M0_DATA_VENV:-/tmp/ensabc-m0-data/.venv}/bin/python\" "
+            "validation/m0/extract_sample.py --rebuild --from-source --force`."
         )
 
     manifest = read_json(manifest_path)
