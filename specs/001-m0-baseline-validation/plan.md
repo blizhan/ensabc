@@ -6,6 +6,8 @@
 
 **Input**: `specs/001-m0-baseline-validation/spec.md`
 
+**Current Status（2026-10-24 同步）**: 本计划已实施，正式验收于 2026-10-20 得到 `passed`，FR-001–FR-014 全部通过；任务见 [tasks.md](tasks.md)，复跑及最终结论见 [quickstart.md](quickstart.md)。下文保留规划时的技术判断、实验缺口与实施顺序；这些缺口不是当前未完成项。样本仍采用清单加回源恢复，派生数值的再分发许可未落实，其他平台未验证。
+
 ## Summary
 
 M0 冻结一份真实区域集合输入，形成三次独立进程的参考结果，验证 Rust DuckDB 扩展的数据往返，并生成逐项可复核证据。正式原生聚类属于 M1。研究和 spike 为技术选择提供证据，不能直接推出 M0 整体通过。
@@ -32,7 +34,7 @@ M0 冻结一份真实区域集合输入，形成三次独立进程的参考结�
 
 **Scale/Scope**: 一个模型、一个起报、一个有效时刻、近地面气温区域场。参考 StandardScaler -> PCA(2) -> KMeans(3)，扩展只 echo，不执行正式聚类或概率校准。
 
-**Frozen candidate**: WeatherBench2 IFS ENS，2020-01-01 00 UTC 起报 +24h，全部 50 个扰动成员、3×3 个点、K 单位。科学数据资格已有提取证据；该再加工归档的具体使用/分发许可尚未落实为来源许可证文件，正式样本门禁仍需该证据。当前文件仅本地研究保存，未提交或发布，不据公开可读性推断再分发授权。
+**Frozen sample（正式验收后更新）**: WeatherBench2 IFS ENS，2020-01-01 00 UTC 起报 +24h，全部 50 个扰动成员、3×3 个点、K 单位。真实样本、清单、离线副本校验和回源恢复已通过正式门禁。派生数值的再分发许可仍未落实，因此不提交数值载荷，只提交清单、源 generation 和恢复步骤；不据公开可读性推断再分发授权。
 
 ## Constitution Check
 
@@ -64,7 +66,7 @@ specs/001-m0-baseline-validation/
     └── extension/
 ```
 
-本次保留可复跑 spike 和必要小型证据。`tasks.md` 由下一步 speckit-tasks 生成，不在本次规划中创建。
+规划时保留可复跑 spike 和必要小型证据；随后生成的 [tasks.md](tasks.md) 中 T001–T024 已全部完成。
 
 ### Source Code (implementation target)
 

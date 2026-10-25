@@ -1,0 +1,307 @@
+{
+  "schema_version": "m1.synthetic-tasks.v1",
+  "kind": "synthetic",
+  "note": "Synthetic validation tasks for M1 core algorithm and DuckDB SQL adapter. These cases are redistributable synthetic fixtures and must never satisfy the real-sample gate.",
+  "positive": [
+    {
+      "case_id": "explainable_two_clusters_2d_proj",
+      "description": "6 members in 4 dimensions, 2 clear clusters, projected to 2D",
+      "config": {
+        "projection_dim": 2,
+        "cluster_count": 2,
+        "initialization": "kmeans++_chacha8_v1",
+        "seed": 42,
+        "restarts": 3,
+        "initial_centers": [],
+        "stopping_rule": "sklearn_variance_scaled_v1",
+        "tolerance": 0.0001,
+        "max_iterations": 300,
+        "rank_threshold": 1e-10
+      },
+      "members": [
+        {"member_id": "c1_m1", "features": [10.0, 1.0, 0.5, 20.0]},
+        {"member_id": "c1_m2", "features": [10.5, 1.1, 0.6, 20.2]},
+        {"member_id": "c1_m3", "features": [10.2, 0.9, 0.4, 19.8]},
+        {"member_id": "c2_m1", "features": [50.0, 9.0, 8.0, 80.0]},
+        {"member_id": "c2_m2", "features": [50.5, 9.2, 8.1, 80.5]},
+        {"member_id": "c2_m3", "features": [49.8, 8.8, 7.9, 79.5]}
+      ],
+      "expected": {
+        "cluster_count": 2,
+        "member_count": 6,
+        "rank_after_scaling": 3
+      }
+    },
+    {
+      "case_id": "boundary_d1_projection",
+      "description": "Boundary projection dimension d=1 with k=2",
+      "config": {
+        "projection_dim": 1,
+        "cluster_count": 2,
+        "initialization": "kmeans++_chacha8_v1",
+        "seed": 123,
+        "restarts": 2,
+        "initial_centers": [],
+        "stopping_rule": "sklearn_variance_scaled_v1",
+        "tolerance": 0.0001,
+        "max_iterations": 300,
+        "rank_threshold": 1e-10
+      },
+      "members": [
+        {"member_id": "p01", "features": [1.0, 2.0]},
+        {"member_id": "p02", "features": [1.2, 2.1]},
+        {"member_id": "p03", "features": [10.0, 20.0]},
+        {"member_id": "p04", "features": [10.3, 20.2]}
+      ],
+      "expected": {
+        "cluster_count": 2,
+        "member_count": 4,
+        "rank_after_scaling": 2
+      }
+    },
+    {
+      "case_id": "boundary_d_equals_rank",
+      "description": "Boundary condition where d equals the effective matrix rank",
+      "config": {
+        "projection_dim": 2,
+        "cluster_count": 2,
+        "initialization": "kmeans++_chacha8_v1",
+        "seed": 7,
+        "restarts": 2,
+        "initial_centers": [],
+        "stopping_rule": "sklearn_variance_scaled_v1",
+        "tolerance": 0.0001,
+        "max_iterations": 300,
+        "rank_threshold": 1e-10
+      },
+      "members": [
+        {"member_id": "m1", "features": [0.0, 1.0, 0.0]},
+        {"member_id": "m2", "features": [1.0, 0.0, 0.0]},
+        {"member_id": "m3", "features": [0.0, -1.0, 0.0]},
+        {"member_id": "m4", "features": [-1.0, 0.0, 0.0]}
+      ],
+      "expected": {
+        "cluster_count": 2,
+        "member_count": 4,
+        "rank_after_scaling": 2
+      }
+    },
+    {
+      "case_id": "boundary_k_equals_distinct_members",
+      "description": "Boundary k equals number of distinct members (k=3, n=3)",
+      "config": {
+        "projection_dim": 2,
+        "cluster_count": 3,
+        "initialization": "kmeans++_chacha8_v1",
+        "seed": 0,
+        "restarts": 1,
+        "initial_centers": [],
+        "stopping_rule": "sklearn_variance_scaled_v1",
+        "tolerance": 0.0001,
+        "max_iterations": 300,
+        "rank_threshold": 1e-10
+      },
+      "members": [
+        {"member_id": "iso_1", "features": [0.0, 10.0, 1.0]},
+        {"member_id": "iso_2", "features": [10.0, 0.0, 2.0]},
+        {"member_id": "iso_3", "features": [-5.0, -5.0, 3.0]}
+      ],
+      "expected": {
+        "cluster_count": 3,
+        "member_count": 3,
+        "member_counts": [1, 1, 1]
+      }
+    },
+    {
+      "case_id": "duplicate_values_distinct_identities",
+      "description": "Distinct member IDs sharing identical feature coordinates",
+      "config": {
+        "projection_dim": 1,
+        "cluster_count": 2,
+        "initialization": "kmeans++_chacha8_v1",
+        "seed": 99,
+        "restarts": 2,
+        "initial_centers": [],
+        "stopping_rule": "sklearn_variance_scaled_v1",
+        "tolerance": 0.0001,
+        "max_iterations": 300,
+        "rank_threshold": 1e-10
+      },
+      "members": [
+        {"member_id": "dup_a1", "features": [2.0, 4.0]},
+        {"member_id": "dup_a2", "features": [2.0, 4.0]},
+        {"member_id": "dup_b1", "features": [50.0, 100.0]},
+        {"member_id": "dup_b2", "features": [50.0, 100.0]}
+      ],
+      "expected": {
+        "cluster_count": 2,
+        "member_count": 4
+      }
+    },
+    {
+      "case_id": "constant_feature_retained",
+      "description": "Feature column with zero variance across all members is scaled by 1.0 and retained",
+      "config": {
+        "projection_dim": 2,
+        "cluster_count": 2,
+        "initialization": "kmeans++_chacha8_v1",
+        "seed": 1,
+        "restarts": 2,
+        "initial_centers": [],
+        "stopping_rule": "sklearn_variance_scaled_v1",
+        "tolerance": 0.0001,
+        "max_iterations": 300,
+        "rank_threshold": 1e-10
+      },
+      "members": [
+        {"member_id": "cf_1", "features": [1.0, 999.0, 2.0]},
+        {"member_id": "cf_2", "features": [1.5, 999.0, 2.5]},
+        {"member_id": "cf_3", "features": [10.0, 999.0, 20.0]},
+        {"member_id": "cf_4", "features": [10.5, 999.0, 20.5]}
+      ],
+      "expected": {
+        "cluster_count": 2,
+        "member_count": 4,
+        "rank_after_scaling": 2
+      }
+    },
+    {
+      "case_id": "representative_tie_resolution",
+      "description": "Members equidistant from cluster center resolve tie by earliest input member order",
+      "config": {
+        "projection_dim": 1,
+        "cluster_count": 2,
+        "initialization": "explicit_centers_v1",
+        "seed": 0,
+        "restarts": 1,
+        "initial_centers": [
+          [[-1.0], [1.0]]
+        ],
+        "stopping_rule": "sklearn_variance_scaled_v1",
+        "tolerance": 0.0001,
+        "max_iterations": 300,
+        "rank_threshold": 1e-10
+      },
+      "members": [
+        {"member_id": "tie_first", "features": [-2.0, 0.0]},
+        {"member_id": "tie_second", "features": [0.0, 0.0]},
+        {"member_id": "other_1", "features": [10.0, 0.0]},
+        {"member_id": "other_2", "features": [12.0, 0.0]}
+      ],
+      "expected": {
+        "cluster_count": 2,
+        "representative_ties_checked": true
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "case_id": "empty_members",
+      "category": "empty_member_list",
+      "expected_code": "EMPTY_MEMBERS",
+      "description": "Empty member list provided to clustering"
+    },
+    {
+      "case_id": "empty_member_id",
+      "category": "null_or_empty_member_id",
+      "expected_code": "EMPTY_MEMBER_ID",
+      "description": "Member has empty string ID"
+    },
+    {
+      "case_id": "duplicate_member_id",
+      "category": "duplicate_member_id",
+      "expected_code": "DUPLICATE_MEMBER_ID",
+      "description": "Two members have identical member IDs"
+    },
+    {
+      "case_id": "empty_features",
+      "category": "null_or_empty_features_list",
+      "expected_code": "EMPTY_FEATURES",
+      "description": "Member has empty features array"
+    },
+    {
+      "case_id": "ragged_features",
+      "category": "unequal_feature_lengths",
+      "expected_code": "RAGGED_FEATURES",
+      "description": "Members have different feature vector lengths"
+    },
+    {
+      "case_id": "non_finite_nan_feature",
+      "category": "nan_feature_element",
+      "expected_code": "NON_FINITE_INPUT",
+      "description": "Feature vector contains NaN value"
+    },
+    {
+      "case_id": "non_finite_inf_feature",
+      "category": "infinite_feature_element",
+      "expected_code": "NON_FINITE_INPUT",
+      "description": "Feature vector contains Infinity value"
+    },
+    {
+      "case_id": "invalid_config_k_less_than_2",
+      "category": "parameter_boundary",
+      "expected_code": "INVALID_CONFIG",
+      "description": "cluster_count k < 2"
+    },
+    {
+      "case_id": "invalid_config_k_greater_than_n",
+      "category": "parameter_boundary",
+      "expected_code": "INVALID_CONFIG",
+      "description": "cluster_count k > number of members n"
+    },
+    {
+      "case_id": "invalid_config_d_less_than_1",
+      "category": "parameter_boundary",
+      "expected_code": "INVALID_CONFIG",
+      "description": "projection_dim d < 1"
+    },
+    {
+      "case_id": "invalid_config_negative_tol",
+      "category": "parameter_boundary",
+      "expected_code": "INVALID_CONFIG",
+      "description": "tolerance < 0.0"
+    },
+    {
+      "case_id": "invalid_config_zero_max_iter",
+      "category": "parameter_boundary",
+      "expected_code": "INVALID_CONFIG",
+      "description": "max_iterations = 0"
+    },
+    {
+      "case_id": "invalid_config_non_positive_rank_threshold",
+      "category": "parameter_boundary",
+      "expected_code": "INVALID_CONFIG",
+      "description": "rank_threshold <= 0.0"
+    },
+    {
+      "case_id": "invalid_initial_centers_shape",
+      "category": "illegal_initial_centers",
+      "expected_code": "INVALID_INITIAL_CENTERS",
+      "description": "Explicit centers count does not match restarts or k or d"
+    },
+    {
+      "case_id": "insufficient_distinct_vectors",
+      "category": "insufficient_distinct_vectors",
+      "expected_code": "INSUFFICIENT_DISTINCT_VECTORS",
+      "description": "Fewer distinct member vectors than cluster_count k"
+    },
+    {
+      "case_id": "insufficient_rank",
+      "category": "insufficient_rank",
+      "expected_code": "INSUFFICIENT_RANK",
+      "description": "Matrix rank after standardization is strictly less than projection_dim d"
+    },
+    {
+      "case_id": "ambiguous_subspace",
+      "category": "ambiguous_subspace",
+      "expected_code": "AMBIGUOUS_SUBSPACE",
+      "description": "Singular value cutoff gap is smaller than rank_threshold * s_max"
+    },
+    {
+      "case_id": "insufficient_projected_vectors",
+      "category": "insufficient_projected_vectors",
+      "expected_code": "INSUFFICIENT_PROJECTED_VECTORS",
+      "description": "Projection collapses distinct points such that distinct projected vectors < k"
+    }
+  ]
+}

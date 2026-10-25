@@ -1,0 +1,16 @@
+[package]
+name = "ensabc-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Pure Rust computational core for ensemble scenario generation (PCA + K-means)"
+
+[dependencies]
+nalgebra = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }
+
+[dev-dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }

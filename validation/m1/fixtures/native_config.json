@@ -1,0 +1,16 @@
+{
+  "schema_version": "m1.config.v1",
+  "algorithm_version": "m1.native.v1",
+  "description": "Native configuration defaults for M1 single-batch scenario computation.",
+  "comparison_rules_path": "comparison_rules.json",
+  "projection_dim": 2,
+  "cluster_count": 3,
+  "initialization": "kmeans++_chacha8_v1",
+  "seed": 3,
+  "restarts": 10,
+  "initial_centers": [],
+  "stopping_rule": "sklearn_variance_scaled_v1",
+  "tolerance": 0.0001,
+  "max_iterations": 300,
+  "rank_threshold": 1e-10
+}

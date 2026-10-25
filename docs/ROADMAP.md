@@ -1,6 +1,6 @@
 # ensabc 项目现状与完整技术路线
 
-记录日期：2026-10-20
+记录日期：2026-10-20；阶段状态更新：2026-10-24
 
 本文记录项目重启时的上下文与后续路线。阶段按依赖和验收条件推进，不构成工期承诺。后续调整直接更新本文，并在末尾记录关键决策变化。
 
@@ -42,7 +42,7 @@
 
 ### 尚未确定
 
-下列主要指长期产品决策。M0 的实验版本、二维投影/三簇参考配置和 echo 签名已在 [技术计划](../specs/001-m0-baseline-validation/plan.md) 中固定，不自动成为 M1 之后的产品默认值。
+下列主要指长期产品决策。M0 的实验版本、二维投影/三簇参考配置和 echo 签名已固定；M1 的首版依赖、初始化、数值语义与 SQL 契约已在 [M1 技术计划](../specs/002-m1-scenario-computation/plan.md) 中确定，尚待实施验证，不自动成为后续阶段的长期产品默认值。
 
 - Rust 数值计算依赖、初始化策略、PCA 维度及最终聚类算法。
 - 特征标准化、空间权重、缺失值策略和匹配距离。
@@ -53,7 +53,7 @@
 
 ## 3. 当前代码状态
 
-本节为重启时快照：2026-10-20 对本地仓库的静态阅读；最近一条本地提交为 `07e0907`，日期 2023-08-08。当时未运行教程、下载数据或验证实时数据源。后续规划期的下载与 spike 结果另见 M0 研究记录，不覆盖这一历史快照。
+本节为重启时快照：2026-10-20 对本地仓库的静态阅读；最近一条本地提交为 `07e0907`，日期 2023-08-08。当时未运行教程、下载数据或验证实时数据源。后续已新增 Rust workspace、诊断扩展、验证脚本与完整 M0 验收，见第 6 节；这些交付不覆盖本节的历史快照。
 
 | 路径 | 已有能力 | 后续用途 |
 | --- | --- | --- |
@@ -186,7 +186,7 @@ docs/
 
 ### M0：可复现基线与接口验证
 
-当前规格见 [M0 spec](../specs/001-m0-baseline-validation/spec.md)，技术计划见 [plan](../specs/001-m0-baseline-validation/plan.md)，质量检查见 [requirements checklist](../specs/001-m0-baseline-validation/checklists/requirements.md)。规划期已开展三个 Luna max spike；真实区域提取和合成参考重复性已有局部证据，详情见 [research](../specs/001-m0-baseline-validation/research.md)。以下复选框代表正式 M0 交付验收，不能仅凭 spike 完成就勾选。
+已完成的规格见 [M0 spec](../specs/001-m0-baseline-validation/spec.md)，技术计划见 [plan](../specs/001-m0-baseline-validation/plan.md)，质量检查见 [requirements checklist](../specs/001-m0-baseline-validation/checklists/requirements.md)。[research](../specs/001-m0-baseline-validation/research.md) 保留三个规划期 spike 的历史记录；以下复选框依据正式实现与验收证据。
 
 **状态（2026-10-20）：正式 M0 验收已执行。** 总体判定为 `passed`，FR-001 至
 FR-014 全部有实测证据。证据位于 `artifacts/m0/<run-id>/`，复核命令见
@@ -245,20 +245,22 @@ FR-014 全部有实测证据。证据位于 `artifacts/m0/<run-id>/`，复核命
   规划期与正式实现；`artifacts/m0/` 仍不入库，因为它是可由门禁重新生成的证据，
   而非源材料。
 
-这两条实验线可并行。此阶段无需全面重构旧下载器或一次性恢复所有教程。
+M0 已完成，无需为进入 M1 全面重构旧下载器或恢复所有教程。
 
 ### M1：单批次情景计算
 
+**状态（2026-10-24）**：已完成。独立 Rust core（nalgebra std-only、Fallible 预分配）、DuckDB SQL 扩展（`ens_cluster` 标量函数）、六阶段数值验证、错误恢复、最小运行环境、资源测量与独立复现已全部实施并通过完整门禁验收（`artifacts/m1/m1-gate-final/report.json`）。17 项功能需求与 8 项成功标准全部通过。详见 [M1 规格](../specs/002-m1-scenario-computation/spec.md)、[计划](../specs/002-m1-scenario-computation/plan.md)、[研究决策](../specs/002-m1-scenario-computation/research.md) 和 [复跑指南](../specs/002-m1-scenario-computation/quickstart.md)。
+
 任务：
 
-- [ ] 实现最小 Rust core 与输入校验。
-- [ ] 对照 Python 基线验证聚类结果。
-- [ ] 输出成员归属、代表情景、成员占比和诊断信息。
-- [ ] 接入 DuckDB SQL，完成真实数据路径联调。
-- [ ] 提供可执行示例、最小测试和目标平台构建检查。
-- [ ] 测量代表性输入上的耗时和峰值内存。
+- [X] 实现最小 Rust core 与输入校验。
+- [X] 对照 Python 基线验证聚类结果。
+- [X] 输出成员归属、代表情景、成员占比和诊断信息。
+- [X] 接入 DuckDB SQL，完成真实数据路径联调。
+- [X] 提供可执行示例、最小测试和目标平台构建检查。
+- [X] 测量代表性输入上的耗时和峰值内存。
 
-完成标志：从数据到情景结果的端到端流程可复现；Python/Rust 对照与输入错误测试通过；新环境可按文档运行。
+完成标志：从数据到情景结果的端到端流程可复现；Python/Rust 对照与输入错误测试通过；新环境可按文档运行。门禁报告 `artifacts/m1/m1-gate-final/report.json` 总体判定 `passed`，独立审计与追溯矩阵全部通过。
 
 这是第一个可发布版本。固定聚类数可以作为明确的初版约定，但需保留质量诊断，不承诺自动找到最佳情景数。
 
@@ -366,10 +368,18 @@ WASM 如为首发要求，应提前到 M0 验证。native 扩展与浏览器端�
 | 2026-10-20 | 按用户调用 speckit-plan，由三个 Luna max worker 进行数据、参考、扩展 spike；选择 WeatherBench2 2020-01-01 00 UTC +24h、50 成员、3×3 区域作为 M0 样本，形成技术计划、数据模型、SQL/验证/证据契约和复跑指南 |
 | 2026-10-20 | 按用户调用 speckit-tasks 生成 [M0 实施任务清单](../specs/001-m0-baseline-validation/tasks.md)（T001–T024，按 US1–US4 组织） |
 | 2026-10-20 | 按用户调用 speckit-implement 执行正式 M0 实施与门禁验证：建立 Rust workspace 与 `crates/ensabc-duckdb` 扩展、`validation/m0/` 验证脚本与冻结样本清单；修复规划期已知的顶层 `NULL` 契约失败（改用 `duckdb::ffi` C API 注册 special handling）；门禁总体 `passed`，FR-001–FR-014 全部有证据 |
-
-下一步按 `specs/001-m0-baseline-validation/tasks.md` 执行正式 M0 实施与门禁验证。当前已有规划期实验，尚未形成完整 M0 通过结论。实施后完成正式验收时更新复选框，并记录样本、版本、命令和结果的位置；改变核心方向时同步更新“决策状态”。
+| 2026-10-24 | 同步 M0 规格、规划与研究文档的当前状态，保留规划期实验快照；按用户调用 speckit-specify 生成 `002-m1-scenario-computation`，定义单批次情景输出、数值迁移对照、查询集成、错误恢复及资源验收范围 |
+| 2026-10-24 | 按用户调用 speckit-plan，由三个 Luna6 max 子代理只读调研；主代理核对锁定 sklearn/C API 与新增 Rust 包元数据，执行单次 Python 参考及 SQL 类型绑定规划实验，形成 M1 计划、数据模型、core/数值/SQL/验证/证据契约与复跑指南；未实施或执行 M1 验收 |
+| 2026-10-24 | 生成 M1 T001–T041 并只读分析；按用户要求修订 I1/U1/I2/I3，明确 original/native/shared 阶段顺序、锁定内核的无扰动轨迹观察及 initial_member_indices 模式规则，同步任务与状态，保留全部任务未完成；规划观察两种停止路径与未包装参考最终结果精确一致 |
+| 2026-10-24 | 按复核及用户要求修订 I4：T034 独立实现复现父/子模式及外部路径参数，T037 仅调用父模式；子集不依赖整体 gate/追溯/审计，也不宣称 M1 完成，父运行保留子证据供独立审计 |
+| 2026-10-24 | M1 实施完成并执行正式门禁验证（run-id: m1-gate-final）：纯 Rust core、DuckDB ens_cluster 标量扩展、六阶段双路径数值对齐（Q 几何对齐 + 共享轨迹一致）、最小容器运行、性能测量与独立复现全部通过，report overall 为 passed，FR-001–FR-017 与 SC-001–SC-008 覆盖率 100% |
 
 **2026-10-20 更新：正式 M0 验收已执行，总体判定 `passed`。** 复跑命令见
 [M0 quickstart](../specs/001-m0-baseline-validation/quickstart.md)，证据位于
-`artifacts/m0/<run-id>/`。下一步进入 M1：建立 `ensabc-core` 并实现原生聚类，
-对照本文档记录的 Python 参考基线验证数值等价。
+`artifacts/m0/<run-id>/`。
+
+**2026-10-24 更新：正式 M1 验收已执行，总体判定 `passed`。** 复跑命令见
+[M1 quickstart](../specs/002-m1-scenario-computation/quickstart.md)，证据位于
+`artifacts/m1/m1-gate-final/`。
+
+**当前下一步（2026-10-24）**：M1 门禁通过，进入 M2 跨批次匹配规划（speckit-specify）。

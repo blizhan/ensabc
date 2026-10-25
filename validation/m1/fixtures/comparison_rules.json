@@ -1,0 +1,50 @@
+{
+  "schema_version": "m1.comparison.v1",
+  "description": "Fixed tolerance and alignment rules for M1 numerical validation and comparison.",
+  "tolerances": {
+    "absolute_tolerance": 1e-8,
+    "relative_tolerance": 1e-6,
+    "fraction_absolute_tolerance": 1e-12,
+    "rank_threshold": 1e-10
+  },
+  "formula": "abs(actual - reference) <= 1e-8 + 1e-6 * abs(reference)",
+  "fraction_sum_formula": "abs(sum(member_fraction) - 1.0) <= 1e-12",
+  "svd": {
+    "solver": "nalgebra_try_new_f64",
+    "max_iterations": 10000,
+    "rank_threshold": 1e-10
+  },
+  "alignment": {
+    "method": "orthogonal_procrustes",
+    "direction": "scores_native * Q ≈ scores_reference",
+    "center_mapping": "C_reference * Q^T",
+    "subspace_check": "B^T B and pairwise member distance consistency"
+  },
+  "normalization": {
+    "pca_sign_rule": "maximum-absolute loading positive in each component",
+    "label_rule": "canonicalized by first member occurrence in input order (0..k-1)",
+    "partition_rule": "co-membership equivalence"
+  },
+  "trace_observation": {
+    "kernel": "sklearn.cluster._kmeans.lloyd_iter_chunked_dense",
+    "check_file": "observer-check.json",
+    "final_assignment_shift": null,
+    "final_assignment_counts_as_iteration": false
+  },
+  "numeric_fields_compared": [
+    "mean",
+    "scale",
+    "scaled",
+    "components",
+    "explained_variance_ratio",
+    "scores",
+    "centers",
+    "cluster_sse",
+    "total_sse",
+    "mean_features"
+  ],
+  "integer_fields_compared": [
+    "rank_after_scaling",
+    "n_iter"
+  ]
+}

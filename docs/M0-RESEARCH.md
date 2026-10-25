@@ -4,7 +4,7 @@
 
 本文是规划输入，不是 M0 spec，也不代表 M0 已开始实施或完成验收。按用户要求，先收集信息，再据此讨论 M0 spec，之后才实施。
 
-后续状态：2026-10-20 已生成 [M0 规格](../specs/001-m0-baseline-validation/spec.md)，随后按用户调用开展技术规划和三个 Luna max spike，见 [计划](../specs/001-m0-baseline-validation/plan.md) 与 [新研究记录](../specs/001-m0-baseline-validation/research.md)。本文中“尚未编写 spec”“未下载/构建”等表述保留为前置调查当时的状态；后续实验不代表完整 M0 验收通过。
+后续状态（2026-10-24 同步）：[M0 规格](../specs/001-m0-baseline-validation/spec.md)、[计划](../specs/001-m0-baseline-validation/plan.md)、三个规划期 spike 及正式实施均已完成。正式 M0 于 2026-10-20 总体 `passed`，FR-001–FR-014 全部通过，审计及追溯检查通过；最终记录与限制见 [项目路线](ROADMAP.md) 和 [复跑指南](../specs/001-m0-baseline-validation/quickstart.md)。本文中“尚未编写 spec”“未下载/构建”等表述保留为前置调查当时的状态，不代表当前进度。
 
 ## 1. 调查方式
 

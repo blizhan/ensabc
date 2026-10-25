@@ -8,7 +8,8 @@ description = "M0 DuckDB extension exposing the ens_m0_echo diagnostic roundtrip
 
 [lib]
 name = "ensabc_m0_extension"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 duckdb = { workspace = true }
+ensabc-core = { workspace = true }

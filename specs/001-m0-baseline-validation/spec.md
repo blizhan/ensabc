@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-20
 
-**Status**: Planned — 已形成技术计划与规划期 spike；正式 M0 验收未完成，已知缺口见 [research.md](research.md)
+**Status**: Completed — 2026-10-20 正式 M0 验收总体 `passed`，FR-001–FR-014 全部通过，报告审计及 FR/SC 追溯检查通过。2026-10-24 同步状态；复跑与限制见 [quickstart.md](quickstart.md) 和 [项目路线](../../docs/ROADMAP.md)。[research.md](research.md) 保留规划期实验记录，不代表当前阶段状态。
 
 **Input**: User description: "$speckit-specify M0"；范围依据项目路线、前置信息收集及用户明确的原生 Rust 约束。
 

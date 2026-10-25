@@ -1,6 +1,8 @@
 # M0 技术研究与 spike 决策
 
-日期：2026-10-20。三个 Luna max worker 分别进行数据提取、Rust 扩展和数值参考实验。本文件区分设计决策、实际观察与尚未满足的正式验收，研究完成不等于 M0 通过。
+日期：2026-10-20。三个 Luna max worker 分别进行数据提取、Rust 扩展和数值参考实验。本文件保留规划期的设计决策、实际观察与当时尚未满足的正式验收；研究完成不等于验收通过。
+
+**后续状态（2026-10-24 同步）**：正式 M0 已于 2026-10-20 完成，整体 `passed`，FR-001–FR-014 全部通过，审计及追溯检查通过。顶层 NULL、真实样本三进程参考、完整错误恢复、并发、资源及最小环境等当时缺口已由正式实现覆盖，见 [tasks.md](tasks.md) 和 [quickstart.md](quickstart.md)。样本派生数值的再分发许可仍未落实，继续采用清单及回源恢复模式；M1 数值候选仍待技术规划与实际验证。
 
 ## 1. 固定输入优先于跨提供商对照
 
@@ -18,7 +20,7 @@
 
 CSV 使用能 round-trip float32 的十进制表示。正式标准化前必须先还原源 float32，再准确提升为 float64；不能直接把 CSV 小数作为源 float64 值。主会话按该路径运行一次参考函数，得到有效秩 9、簇大小 14/20/16、惯性 87.09307906385827，证明样本可支持当前算法条件；这不是三进程真实基线验收。
 
-样本清单、具体源对象 generation、提取工具和使用条件见 [data findings](spikes/data/findings.md) 与 [sample.json](spikes/data/sample.json)。正式验收仍须按数据模型补齐规范化清单、离线恢复和报告。
+规划期的样本清单、具体源对象 generation、提取工具和使用条件见 [data findings](spikes/data/findings.md)；当时生成的 `spikes/data/sample.json` 不随仓库保存。随后完成的 [正式样本清单](../../validation/m0/fixtures/real_ifs_ens_20200101_t2m_manifest.json)、离线恢复和报告已纳入正式验收。
 
 **使用边界（含 `snv/deepseek-v4.1-flash` 补充核查）**：
 - WeatherBench2 指南（`https://weatherbench2.readthedocs.io/en/latest/data-guide.html#ifs-ens`）原文声明 `All data from the TIGGE archive can only be used for research purposes. Please check the license for more specific constraints.`，且对应 GCS 路径下的 `LICENSE` 探测返回 404；旧版 TIGGE 条款（`https://apps.ecmwf.int/datasets/licences/tigge/`）写明 ECMWF 贡献为 CC BY-NC 4.0、非 ECMWF 数据不得向组织外第三方提供，而新版 ECDS TIGGE（`https://ecds.ecmwf.int/licences/tigge-licence`）将 ECMWF 列为 CC BY 4.0。由于 WeatherBench2 再加工对象的具体许可证文件缺失，本地研究保存与回源按 GCS generation 恢复可行，但随仓库公开再分发许可链未闭合。
@@ -97,9 +99,11 @@ DuckDB 默认 NULL 传播不能满足明确拒绝 NULL 的要求。实现必须�
 
 本轮只读核查的版本、默认/可选 features、官方资料和限制见 [baseline findings](spikes/baseline/findings.md#rust-候选只读)。未编译这两条 Rust 数值路径，完整 feature tree 和 native 链接验证仍属于 M1。
 
-## 7. 本轮结果与正式门禁
+## 7. 规划期结果与当时的正式门禁缺口
 
-| 范围 | 本轮证据 | 正式 M0 状态 |
+本节是规划期快照；当前阶段结论见文首“后续状态”。
+
+| 范围 | 规划期证据 | 规划期的正式 M0 状态 |
 | --- | --- | --- |
 | 真实数据提取 | 50×9 矩阵、源对象 generation、哈希、离线恢复和拒绝覆盖检查通过 | 仍需规范化清单及来源使用/恢复条件 |
 | 合成参考 | 三个独立进程一致，比较器正反例通过；主会话复跑确认 | 不能替代真实样本参考 |
@@ -109,4 +113,4 @@ DuckDB 默认 NULL 传播不能满足明确拒绝 NULL 的要求。实现必须�
 | 完整异常恢复、并发、资源、无参考工具环境 | spike 只覆盖 findings 中列出的局部案例 | 全量验收尚未执行 |
 | M1 数值依赖 | 两种候选的只读文档/feature 评估 | 未构建、未数值对照 |
 
-总体结论：技术路线已可分解为任务；M0 整体验收未通过。来源使用条件与顶层 NULL 是明确的前置工作，其余正式门禁按 [证据契约](contracts/evidence.md) 落实，不把“后续有计划”记为通过。
+规划期结论：当时技术路线已可分解为任务，但尚未通过整体验收；来源使用条件与顶层 NULL 是当时的前置工作。随后已按 [证据契约](contracts/evidence.md) 完成正式实现与门禁并得到 `passed`，没有仅凭研究结果宣布通过。
