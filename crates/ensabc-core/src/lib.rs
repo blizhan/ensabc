@@ -3,9 +3,26 @@
 //! Exposes the single public entry point `cluster(&TaskInput) -> Result<ScenarioResult, CoreError>`.
 //! Does not depend on DuckDB, Arrow, Python, external BLAS/LAPACK, or filesystem I/O.
 
+#![allow(
+    clippy::needless_range_loop,
+    clippy::type_complexity,
+    clippy::manual_contains,
+    clippy::collapsible_if
+)]
+
+pub mod dispersion;
+pub mod fsum;
 pub mod kmeans;
+pub mod matching;
 pub mod preprocess;
 pub mod summary;
+
+pub use dispersion::ensemble_dispersion;
+pub use matching::{
+    MATCH_ALGORITHM_VERSION, MAX_SCENARIOS, MAX_SCENARIOS_PER_SIDE, MatchInput, MatchObjective,
+    MatchResult, MatchedLink, ScaledMatchInput, ScenarioNodeInput, Substitutability,
+    UnmatchedScenario, match_scenarios, match_scenarios_scaled,
+};
 
 pub const ALGORITHM_VERSION: &str = "m1.native.v1";
 
@@ -133,6 +150,14 @@ pub enum CoreErrorCode {
     NumericalFailure,
     SizeOverflow,
     AllocationFailure,
+    EmptyScenarios,
+    DimensionMismatch,
+    InvalidWeights,
+    InvalidThreshold,
+    ZeroDispersion,
+    ExceededScenarioLimit,
+    TooManyScenarios,
+    DuplicateScenarioId,
 }
 
 impl CoreErrorCode {
@@ -156,6 +181,14 @@ impl CoreErrorCode {
             Self::NumericalFailure => "NUMERICAL_FAILURE",
             Self::SizeOverflow => "SIZE_OVERFLOW",
             Self::AllocationFailure => "ALLOCATION_FAILURE",
+            Self::EmptyScenarios => "EMPTY_SCENARIOS",
+            Self::DimensionMismatch => "DIMENSION_MISMATCH",
+            Self::InvalidWeights => "INVALID_WEIGHTS",
+            Self::InvalidThreshold => "INVALID_THRESHOLD",
+            Self::ZeroDispersion => "ZERO_DISPERSION",
+            Self::ExceededScenarioLimit => "TOO_MANY_SCENARIOS",
+            Self::TooManyScenarios => "TOO_MANY_SCENARIOS",
+            Self::DuplicateScenarioId => "DUPLICATE_SCENARIO_ID",
         }
     }
 }
@@ -168,6 +201,8 @@ pub struct CoreError {
     pub feature_index: Option<usize>,
     pub restart_index: Option<usize>,
     pub iteration: Option<usize>,
+    pub prev_index: Option<u32>,
+    pub curr_index: Option<u32>,
 }
 
 impl CoreError {
@@ -179,6 +214,8 @@ impl CoreError {
             feature_index: None,
             restart_index: None,
             iteration: None,
+            prev_index: None,
+            curr_index: None,
         }
     }
 
@@ -201,6 +238,16 @@ impl CoreError {
         self.iteration = Some(iteration);
         self
     }
+
+    pub fn with_prev_index(mut self, index: usize) -> Self {
+        self.prev_index = u32::try_from(index).ok();
+        self
+    }
+
+    pub fn with_curr_index(mut self, index: usize) -> Self {
+        self.curr_index = u32::try_from(index).ok();
+        self
+    }
 }
 
 impl std::fmt::Display for CoreError {
@@ -208,6 +255,12 @@ impl std::fmt::Display for CoreError {
         write!(f, "[{}] {}", self.code.as_str(), self.message)?;
         if let Some(m) = self.member_index {
             write!(f, " (member_index={})", m)?;
+        }
+        if let Some(p) = self.prev_index {
+            write!(f, " (prev_index={})", p)?;
+        }
+        if let Some(c) = self.curr_index {
+            write!(f, " (curr_index={})", c)?;
         }
         if let Some(feat) = self.feature_index {
             write!(f, " (feature_index={})", feat)?;

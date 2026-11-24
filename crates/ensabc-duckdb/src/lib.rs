@@ -1,6 +1,12 @@
-//! M0/M1 DuckDB extension: exposes `ens_m0_echo` and `ens_cluster`.
+//! M0/M1/M2 DuckDB extension: exposes `ens_m0_echo`, `ens_cluster`, `ens_dispersion`, and `ens_match_scenarios`.
 
-#![allow(unsafe_op_in_unsafe_fn)]
+#![allow(
+    unsafe_op_in_unsafe_fn,
+    clippy::missing_safety_doc,
+    clippy::needless_range_loop
+)]
+
+pub mod match_ext;
 
 use std::{
     ffi::{CString, c_char},
@@ -1454,6 +1460,9 @@ unsafe fn register(connection: duckdb::ffi::duckdb_connection) -> Result<(), Str
         if state2 != DuckDBSuccess {
             return Err(format!("failed to register {CLUSTER_FUNCTION_NAME}"));
         }
+
+        // 3. Register M2 functions (ens_dispersion and ens_match_scenarios)
+        match_ext::register_match_functions(connection)?;
 
         Ok(())
     }

@@ -1,0 +1,106 @@
+{
+  "weight_id": "cos_lat_center_v1",
+  "description": "Cosine of latitude at cell center for European 3x3 grid",
+  "units": "dimensionless",
+  "grid_shape": [
+    3,
+    3
+  ],
+  "latitudes": [
+    42.1875,
+    47.8125,
+    53.4375
+  ],
+  "longitudes": [
+    5.625,
+    11.25,
+    16.875
+  ],
+  "points": [
+    {
+      "point_index": 0,
+      "latitude": 42.1875,
+      "longitude": 5.625,
+      "weight": 0.7409511253549591,
+      "weight_hex": "0x1.7b5df226aafafp-1"
+    },
+    {
+      "point_index": 1,
+      "latitude": 42.1875,
+      "longitude": 11.25,
+      "weight": 0.7409511253549591,
+      "weight_hex": "0x1.7b5df226aafafp-1"
+    },
+    {
+      "point_index": 2,
+      "latitude": 42.1875,
+      "longitude": 16.875,
+      "weight": 0.7409511253549591,
+      "weight_hex": "0x1.7b5df226aafafp-1"
+    },
+    {
+      "point_index": 3,
+      "latitude": 47.8125,
+      "longitude": 5.625,
+      "weight": 0.6715589548470183,
+      "weight_hex": "0x1.57d69348cec9fp-1"
+    },
+    {
+      "point_index": 4,
+      "latitude": 47.8125,
+      "longitude": 11.25,
+      "weight": 0.6715589548470183,
+      "weight_hex": "0x1.57d69348cec9fp-1"
+    },
+    {
+      "point_index": 5,
+      "latitude": 47.8125,
+      "longitude": 16.875,
+      "weight": 0.6715589548470183,
+      "weight_hex": "0x1.57d69348cec9fp-1"
+    },
+    {
+      "point_index": 6,
+      "latitude": 53.4375,
+      "longitude": 5.625,
+      "weight": 0.5956993044924334,
+      "weight_hex": "0x1.30ff7fce17035p-1"
+    },
+    {
+      "point_index": 7,
+      "latitude": 53.4375,
+      "longitude": 11.25,
+      "weight": 0.5956993044924334,
+      "weight_hex": "0x1.30ff7fce17035p-1"
+    },
+    {
+      "point_index": 8,
+      "latitude": 53.4375,
+      "longitude": 16.875,
+      "weight": 0.5956993044924334,
+      "weight_hex": "0x1.30ff7fce17035p-1"
+    }
+  ],
+  "weights_vector": [
+    0.7409511253549591,
+    0.7409511253549591,
+    0.7409511253549591,
+    0.6715589548470183,
+    0.6715589548470183,
+    0.6715589548470183,
+    0.5956993044924334,
+    0.5956993044924334,
+    0.5956993044924334
+  ],
+  "weights_vector_hex": [
+    "0x1.7b5df226aafafp-1",
+    "0x1.7b5df226aafafp-1",
+    "0x1.7b5df226aafafp-1",
+    "0x1.57d69348cec9fp-1",
+    "0x1.57d69348cec9fp-1",
+    "0x1.57d69348cec9fp-1",
+    "0x1.30ff7fce17035p-1",
+    "0x1.30ff7fce17035p-1",
+    "0x1.30ff7fce17035p-1"
+  ]
+}

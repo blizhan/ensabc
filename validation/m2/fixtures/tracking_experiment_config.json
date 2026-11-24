@@ -1,0 +1,78 @@
+{
+  "schema_version": "m2.tracking-config.v1",
+  "description": "Frozen configuration parameters for M2 cross-batch scenario tracking, sensitivity and perturbation analysis",
+  "clustering": {
+    "algorithm_version": "m1.native.v1",
+    "projection_dim": 2,
+    "default_cluster_count": 3,
+    "initialization": "kmeans++_chacha8_v1",
+    "seed": 3,
+    "restarts": 10,
+    "initial_centers": [],
+    "stopping_rule": "sklearn_variance_scaled_v1",
+    "tolerance": 0.0001,
+    "max_iterations": 300,
+    "rank_threshold": 1e-10
+  },
+  "matching": {
+    "algorithm_version": "m2.match.v1",
+    "spatial_weights_id": "cos_lat_center_v1",
+    "primary_objective": "maximize_matched_count",
+    "secondary_objective": "minimize_weighted_distance_sum",
+    "default_threshold_coefficient": 1.0,
+    "tie_breaking": "canonical_key_total_cmp_v1",
+    "ambiguity_handling": "mark_ambiguous_and_inherit"
+  },
+  "history_replay": {
+    "schema_version": "m2.history.v1",
+    "runs_count": 8,
+    "planned_interval_hours": 12,
+    "baseline_k": 3,
+    "baseline_c": 1.0
+  },
+  "sensitivity": {
+    "cluster_counts": [
+      2,
+      3,
+      4
+    ],
+    "threshold_coefficients": [
+      0.5,
+      0.75,
+      1.0,
+      1.25,
+      1.5,
+      2.0
+    ]
+  },
+  "perturbation": {
+    "prng": "numpy.random.PCG64",
+    "numpy_version": "2.5.4",
+    "matching_level": {
+      "epsilon_k": 0.01,
+      "directions_count": 100,
+      "base_seed": 20261029,
+      "method": "unit_sphere_surface_sampling_pcg64",
+      "loop_order": "seed_0_to_99"
+    },
+    "member_level": {
+      "sigma_levels_k": [
+        0.0,
+        0.001,
+        0.01
+      ],
+      "samples_per_level": 20,
+      "base_seed": 4242,
+      "method": "gaussian_iid_pcg64",
+      "loop_order": "sigma_then_sample_0_to_19"
+    },
+    "stability_certificate": {
+      "rule": "conservative_interval_triangle_inequality",
+      "condition_1": "d_min_drop_minus_tau > 2 * epsilon_abs + delta_tau",
+      "condition_2": "d_min_same_count_alt_delta > 4 * q_star * epsilon_abs",
+      "handling_no_alternative": "mark_no_same_count_alternative",
+      "handling_q_zero": "verify_candidate_graph_empty",
+      "handling_evaluation_ambiguity": "mark_evaluation_mapping_ambiguous"
+    }
+  }
+}

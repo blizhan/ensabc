@@ -1,0 +1,30 @@
+{
+  "target": {
+    "version": "v0.3.5-rc.1",
+    "duckdb_version": "v1.5.5",
+    "platform": "linux_arm64",
+    "zip_filename": "duckomo-v0.3.5-rc.1-duckdb-v1.5.5-linux_arm64.zip",
+    "url": "https://github.com/duckomo/duckomo/releases/download/v0.3.5-rc.1/duckomo-v0.3.5-rc.1-duckdb-v1.5.5-linux_arm64.zip",
+    "zip_sha256": "cee19b262b49fe501a69787149cec4f26cfbaa2899c137e17f0b6834dd099890",
+    "manifest_sha256": "d7b36a255faa4ab02d21f01cb3384ea307ee4e20823bf456aa7a358dcabb8e6b",
+    "sha256sums_sha256": "570f292c02178c02a4a6d514b3b222be5c708ba2450258f6603e46e20023504c",
+    "extension_sha256": "586bc49de1da86c26b9efd46ff1adc07dca8e206967793dad88e20dd53f3047b",
+    "source_commit": "55d66f3fbd3199d7471b8cd569c43cc91a8cec7e",
+    "extension_version": "55d66f3",
+    "host_identity": "Linux aarch64 / DuckDB v1.5.5"
+  },
+  "baseline": {
+    "version": "v0.3.4",
+    "duckdb_version": "v1.5.5",
+    "platform": "linux_arm64",
+    "zip_filename": "duckomo-v0.3.4-duckdb-v1.5.5-linux_arm64.zip",
+    "url": "https://github.com/duckomo/duckomo/releases/download/v0.3.4/duckomo-v0.3.4-duckdb-v1.5.5-linux_arm64.zip",
+    "zip_sha256": "fd123e090a31ba69219eed4e613e56947ba503d127cc38c3d444aadfb929f713",
+    "manifest_sha256": "6a0c921b35f24fba599ad12623558a13cffebad1c72669c44da4f433f6315c54",
+    "sha256sums_sha256": "5f9a3c5f976836cb4abbd7331908ba779352d23ef9d07d49a9e3aa700075a1e9",
+    "extension_sha256": "554e36f68fade713c19a94ac4db3788933c95c22db6ef288da047e2f3e620b80",
+    "source_commit": "c3084c6937d7d4de02a4edb7aaa68cdb5086f7f6",
+    "extension_version": "c3084c6",
+    "host_identity": "Linux aarch64 / DuckDB v1.5.5"
+  }
+}

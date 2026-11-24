@@ -20,6 +20,12 @@ tutorial/data
 # measurements stay outside version control.
 /artifacts/m1/
 
+# M2 run evidence and derived data payloads.
+/artifacts/m2/
+/validation/m2/data/
+/validation/m2/.venv/
+/validation/m2/.cache/
+
 # The derived M0 sample payload is not committed: the redistribution
 # permission for the re-gridded WeatherBench 2 derivative is unresolved.
 # The manifest, the source generation evidence and the recovery procedure are

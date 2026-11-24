@@ -1,0 +1,531 @@
+{
+  "schema_version": "m2.synthetic-tasks.v1",
+  "description": "Comprehensive synthetic match test cases for M2 matching core and SQL adapter",
+  "positive_cases": [
+    {
+      "case_id": "threshold_counterexample_2x2",
+      "description": "Candidate distances [[0, 4], [4, 6]] with tau=5.0 gives 2 links of distance 4.0 instead of greedy 1 link of distance 0.0",
+      "mode": "absolute",
+      "weights": [
+        1.0,
+        1.0
+      ],
+      "threshold": 5.0,
+      "prev_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            3.468626966596886,
+            -4.4686269665968865
+          ]
+        }
+      ],
+      "curr_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            4.0,
+            4.0
+          ]
+        }
+      ],
+      "expected": {
+        "matched_count": 2,
+        "weighted_distance_sum": 8.0,
+        "links": [
+          {
+            "prev_cluster_id": 0,
+            "curr_cluster_id": 1,
+            "distance_k": 4.0,
+            "substitutability": "count_drop",
+            "ambiguous": false
+          },
+          {
+            "prev_cluster_id": 1,
+            "curr_cluster_id": 0,
+            "distance_k": 4.0,
+            "substitutability": "count_drop",
+            "ambiguous": false
+          }
+        ],
+        "unmatched_prev": [],
+        "unmatched_curr": []
+      }
+    },
+    {
+      "case_id": "all_exceed_threshold",
+      "description": "All pairwise distances exceed threshold; returns 0 links as valid success",
+      "mode": "absolute",
+      "weights": [
+        1.0,
+        1.0
+      ],
+      "threshold": 1.0,
+      "prev_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            10.0,
+            10.0
+          ]
+        }
+      ],
+      "curr_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            5.0,
+            5.0
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            20.0,
+            20.0
+          ]
+        }
+      ],
+      "expected": {
+        "matched_count": 0,
+        "weighted_distance_sum": 0.0,
+        "links": [],
+        "unmatched_prev": [
+          {
+            "cluster_id": 0,
+            "reason": "no_candidate_within_threshold"
+          },
+          {
+            "cluster_id": 1,
+            "reason": "no_candidate_within_threshold"
+          }
+        ],
+        "unmatched_curr": [
+          {
+            "cluster_id": 0,
+            "reason": "no_candidate_within_threshold"
+          },
+          {
+            "cluster_id": 1,
+            "reason": "no_candidate_within_threshold"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "exact_threshold_boundary",
+      "description": "Distance exactly equals threshold (d == tau); must be included in feasible set",
+      "mode": "absolute",
+      "weights": [
+        1.0
+      ],
+      "threshold": 3.0,
+      "prev_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            0.0
+          ]
+        }
+      ],
+      "curr_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            3.0
+          ]
+        }
+      ],
+      "expected": {
+        "matched_count": 1,
+        "weighted_distance_sum": 3.0,
+        "links": [
+          {
+            "prev_cluster_id": 0,
+            "curr_cluster_id": 0,
+            "distance_k": 3.0,
+            "substitutability": "count_drop",
+            "ambiguous": false
+          }
+        ],
+        "unmatched_prev": [],
+        "unmatched_curr": []
+      }
+    },
+    {
+      "case_id": "zero_threshold_exact_match_only",
+      "description": "tau=0.0 allows only exact identical feature matches (d == 0)",
+      "mode": "absolute",
+      "weights": [
+        1.0,
+        1.0
+      ],
+      "threshold": 0.0,
+      "prev_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            1.0,
+            2.0
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            3.0,
+            4.0
+          ]
+        }
+      ],
+      "curr_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            1.0,
+            2.0
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            3.0,
+            4.0000001
+          ]
+        }
+      ],
+      "expected": {
+        "matched_count": 1,
+        "weighted_distance_sum": 0.0,
+        "links": [
+          {
+            "prev_cluster_id": 0,
+            "curr_cluster_id": 0,
+            "distance_k": 0.0,
+            "substitutability": "count_drop",
+            "ambiguous": false
+          }
+        ],
+        "unmatched_prev": [
+          {
+            "cluster_id": 1,
+            "reason": "no_candidate_within_threshold"
+          }
+        ],
+        "unmatched_curr": [
+          {
+            "cluster_id": 1,
+            "reason": "no_candidate_within_threshold"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "rectangular_2_to_3_competition",
+      "description": "2 prev scenarios vs 3 curr scenarios; one curr scenario left unmatched due to global competition",
+      "mode": "absolute",
+      "weights": [
+        1.0
+      ],
+      "threshold": 10.0,
+      "prev_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            0.0
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            10.0
+          ]
+        }
+      ],
+      "curr_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            0.5
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            9.5
+          ]
+        },
+        {
+          "cluster_id": 2,
+          "mean_features": [
+            5.0
+          ]
+        }
+      ],
+      "expected": {
+        "matched_count": 2,
+        "weighted_distance_sum": 1.0,
+        "links": [
+          {
+            "prev_cluster_id": 0,
+            "curr_cluster_id": 0,
+            "distance_k": 0.5,
+            "substitutability": "same_count",
+            "ambiguous": false
+          },
+          {
+            "prev_cluster_id": 1,
+            "curr_cluster_id": 1,
+            "distance_k": 0.5,
+            "substitutability": "same_count",
+            "ambiguous": false
+          }
+        ],
+        "unmatched_prev": [],
+        "unmatched_curr": [
+          {
+            "cluster_id": 2,
+            "reason": "not_selected_in_global_optimum"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "rectangular_3_to_2_competition",
+      "description": "3 prev scenarios vs 2 curr scenarios; one prev scenario unselected in global competition",
+      "mode": "absolute",
+      "weights": [
+        1.0
+      ],
+      "threshold": 10.0,
+      "prev_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            0.0
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            5.0
+          ]
+        },
+        {
+          "cluster_id": 2,
+          "mean_features": [
+            10.0
+          ]
+        }
+      ],
+      "curr_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            0.2
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            9.8
+          ]
+        }
+      ],
+      "expected": {
+        "matched_count": 2,
+        "weighted_distance_sum": 0.4,
+        "links": [
+          {
+            "prev_cluster_id": 0,
+            "curr_cluster_id": 0,
+            "distance_k": 0.2,
+            "substitutability": "same_count",
+            "ambiguous": false
+          },
+          {
+            "prev_cluster_id": 2,
+            "curr_cluster_id": 1,
+            "distance_k": 0.2,
+            "substitutability": "same_count",
+            "ambiguous": false
+          }
+        ],
+        "unmatched_prev": [
+          {
+            "cluster_id": 1,
+            "reason": "not_selected_in_global_optimum"
+          }
+        ],
+        "unmatched_curr": []
+      }
+    },
+    {
+      "case_id": "fully_symmetric_ambiguity",
+      "description": "Symmetric square distances: (P0,C0)+(P1,C1) == (P0,C1)+(P1,C0). Both links marked ambiguous=true and substitutability=tied",
+      "mode": "absolute",
+      "weights": [
+        1.0,
+        1.0
+      ],
+      "threshold": 5.0,
+      "prev_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            2.0,
+            2.0
+          ]
+        }
+      ],
+      "curr_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            0.0,
+            2.0
+          ]
+        },
+        {
+          "cluster_id": 1,
+          "mean_features": [
+            2.0,
+            0.0
+          ]
+        }
+      ],
+      "expected": {
+        "matched_count": 2,
+        "weighted_distance_sum": 2.8284271247461903,
+        "tie_detected": true,
+        "links": [
+          {
+            "prev_cluster_id": 0,
+            "curr_cluster_id": 0,
+            "distance_k": 1.4142135623730951,
+            "substitutability": "tied",
+            "ambiguous": true
+          },
+          {
+            "prev_cluster_id": 1,
+            "curr_cluster_id": 1,
+            "distance_k": 1.4142135623730951,
+            "substitutability": "tied",
+            "ambiguous": true
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "negative_zero_normalization",
+      "description": "Features with -0.0 are normalized to +0.0; canonical ordering and distance are identical",
+      "mode": "absolute",
+      "weights": [
+        1.0
+      ],
+      "threshold": 1.0,
+      "prev_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            -0.0
+          ]
+        }
+      ],
+      "curr_scenarios": [
+        {
+          "cluster_id": 0,
+          "mean_features": [
+            0.0
+          ]
+        }
+      ],
+      "expected": {
+        "matched_count": 1,
+        "weighted_distance_sum": 0.0,
+        "links": [
+          {
+            "prev_cluster_id": 0,
+            "curr_cluster_id": 0,
+            "distance_k": 0.0,
+            "substitutability": "count_drop",
+            "ambiguous": false
+          }
+        ]
+      }
+    }
+  ],
+  "invalid_cases": [
+    {
+      "case_id": "empty_prev_scenarios",
+      "expected_code": "EMPTY_SCENARIOS"
+    },
+    {
+      "case_id": "empty_curr_scenarios",
+      "expected_code": "EMPTY_SCENARIOS"
+    },
+    {
+      "case_id": "ragged_features",
+      "expected_code": "RAGGED_FEATURES"
+    },
+    {
+      "case_id": "feature_length_mismatch_weights",
+      "expected_code": "DIMENSION_MISMATCH"
+    },
+    {
+      "case_id": "nan_feature",
+      "expected_code": "NON_FINITE_INPUT"
+    },
+    {
+      "case_id": "inf_feature",
+      "expected_code": "NON_FINITE_INPUT"
+    },
+    {
+      "case_id": "negative_weight",
+      "expected_code": "INVALID_WEIGHTS"
+    },
+    {
+      "case_id": "zero_weight_sum",
+      "expected_code": "INVALID_WEIGHTS"
+    },
+    {
+      "case_id": "negative_threshold",
+      "expected_code": "INVALID_THRESHOLD"
+    },
+    {
+      "case_id": "zero_dispersion",
+      "expected_code": "ZERO_DISPERSION"
+    },
+    {
+      "case_id": "exceed_scenario_limit_13",
+      "expected_code": "TOO_MANY_SCENARIOS"
+    }
+  ]
+}
