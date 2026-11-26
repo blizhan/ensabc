@@ -273,7 +273,10 @@ mod tests {
                 let tau = d_base.min(d_scaled);
                 let res_base = run_pair(base_weights.clone(), tau);
                 let res_scaled = run_pair(scaled_weights, tau);
-                assert_ne!(res_base.objective.matched_count, res_scaled.objective.matched_count);
+                assert_ne!(
+                    res_base.objective.matched_count,
+                    res_scaled.objective.matched_count
+                );
                 assert!((d_scaled - d_base).abs() / d_base < 1e-15);
                 observed_flip = true;
                 break;

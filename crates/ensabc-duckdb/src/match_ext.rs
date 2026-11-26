@@ -38,7 +38,7 @@ const MATCH_ALGORITHM_VERSION: &str = "m2.match.v1";
 // Error Handling
 // ---------------------------------------------------------------------------
 
-struct SqlMatchError {
+pub(crate) struct SqlMatchError {
     func: &'static str,
     code: &'static str,
     row: u64,
@@ -46,7 +46,12 @@ struct SqlMatchError {
 }
 
 impl SqlMatchError {
-    fn new(func: &'static str, code: &'static str, row: u64, message: impl Into<String>) -> Self {
+    pub(crate) fn new(
+        func: &'static str,
+        code: &'static str,
+        row: u64,
+        message: impl Into<String>,
+    ) -> Self {
         Self {
             func,
             code,
@@ -55,7 +60,7 @@ impl SqlMatchError {
         }
     }
 
-    fn from_core(func: &'static str, err: CoreError, row: u64) -> Self {
+    pub(crate) fn from_core(func: &'static str, err: CoreError, row: u64) -> Self {
         let code = err.code.as_str();
         let mut msg = err.message;
         if let Some(m) = err.member_index {
@@ -78,7 +83,7 @@ impl SqlMatchError {
         }
     }
 
-    fn to_c_string(&self) -> CString {
+    pub(crate) fn to_c_string(&self) -> CString {
         let text = format!(
             "{} [{}] chunk_row={}: {}",
             self.func, self.code, self.row, self.message
@@ -91,20 +96,20 @@ impl SqlMatchError {
     }
 }
 
-fn set_error_raw(info: duckdb_function_info, c_str: &CString) {
+pub(crate) fn set_error_raw(info: duckdb_function_info, c_str: &CString) {
     unsafe {
         duckdb_scalar_function_set_error(info, c_str.as_ptr());
     }
 }
 
-fn row_is_valid(validity: *mut u64, row: u64) -> bool {
+pub(crate) fn row_is_valid(validity: *mut u64, row: u64) -> bool {
     if validity.is_null() {
         return true;
     }
     unsafe { duckdb_validity_row_is_valid(validity, row) }
 }
 
-unsafe fn read_string(vector: duckdb_vector, row: u64) -> String {
+pub(crate) unsafe fn read_string(vector: duckdb_vector, row: u64) -> String {
     let data = duckdb_vector_get_data(vector) as *const duckdb_string_t;
     let string = *data.add(row as usize);
     let length = duckdb_string_t_length(string) as usize;
@@ -113,7 +118,7 @@ unsafe fn read_string(vector: duckdb_vector, row: u64) -> String {
     String::from_utf8_lossy(slice).into_owned()
 }
 
-unsafe fn checked_list_entry(
+pub(crate) unsafe fn checked_list_entry(
     func: &'static str,
     vector: duckdb_vector,
     index: u64,
@@ -143,7 +148,7 @@ unsafe fn checked_list_entry(
     Ok(entry)
 }
 
-unsafe fn reserve_list(vector: duckdb_vector, size: usize) -> Result<(), &'static str> {
+pub(crate) unsafe fn reserve_list(vector: duckdb_vector, size: usize) -> Result<(), &'static str> {
     let size = u64::try_from(size).map_err(|_| "LIST size exceeds u64")?;
     if duckdb_list_vector_reserve(vector, size) != DuckDBSuccess {
         return Err("failed to reserve LIST child");
@@ -158,7 +163,7 @@ unsafe fn reserve_list(vector: duckdb_vector, size: usize) -> Result<(), &'stati
 // Logical Type Builders
 // ---------------------------------------------------------------------------
 
-fn build_double_list_type() -> duckdb_logical_type {
+pub(crate) fn build_double_list_type() -> duckdb_logical_type {
     unsafe {
         let mut double_t = duckdb_create_logical_type(DUCKDB_TYPE_DUCKDB_TYPE_DOUBLE);
         let list_t = duckdb_create_list_type(double_t);
@@ -227,7 +232,7 @@ fn build_match_config_type() -> duckdb_logical_type {
     }
 }
 
-fn build_match_return_type() -> duckdb_logical_type {
+pub(crate) fn build_match_return_type() -> duckdb_logical_type {
     unsafe {
         let mut bigint_t = duckdb_create_logical_type(DUCKDB_TYPE_DUCKDB_TYPE_BIGINT);
         let mut double_t = duckdb_create_logical_type(DUCKDB_TYPE_DUCKDB_TYPE_DOUBLE);
@@ -744,10 +749,7 @@ unsafe extern "C" fn match_scenarios_callback(
         let curr_vec = duckdb_data_chunk_get_vector(chunk, 1);
         let weights_vec = duckdb_data_chunk_get_vector(chunk, 2);
         let config_vec = duckdb_data_chunk_get_vector(chunk, 3);
-        if prev_vec.is_null()
-            || curr_vec.is_null()
-            || weights_vec.is_null()
-            || config_vec.is_null()
+        if prev_vec.is_null() || curr_vec.is_null() || weights_vec.is_null() || config_vec.is_null()
         {
             return Err(SqlMatchError::new(
                 MATCH_SCENARIOS_FUNCTION_NAME,

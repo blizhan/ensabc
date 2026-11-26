@@ -416,15 +416,20 @@ fn sanitize_json_non_finite(text: &str) -> String {
 fn run() -> Result<(), RunnerError> {
     let parsed = parse_args();
 
-    let input_bytes = fs::read(&parsed.input_path)
-        .map_err(|e| RunnerError::Usage(format!("Cannot read input file {:?}: {}", parsed.input_path, e)))?;
+    let input_bytes = fs::read(&parsed.input_path).map_err(|e| {
+        RunnerError::Usage(format!(
+            "Cannot read input file {:?}: {}",
+            parsed.input_path, e
+        ))
+    })?;
     let raw_text = String::from_utf8_lossy(&input_bytes);
     let sanitized_text = sanitize_json_non_finite(&raw_text);
 
     match parsed.mode.as_str() {
         "match" => {
-            let env: MatchEnvelopeDto = serde_json::from_str(&sanitized_text)
-                .map_err(|e| RunnerError::Usage(format!("Invalid JSON in match envelope: {}", e)))?;
+            let env: MatchEnvelopeDto = serde_json::from_str(&sanitized_text).map_err(|e| {
+                RunnerError::Usage(format!("Invalid JSON in match envelope: {}", e))
+            })?;
 
             let prev_scens: Vec<ScenarioNodeInput> = env
                 .prev_scenarios
@@ -575,9 +580,10 @@ fn run() -> Result<(), RunnerError> {
             atomic_write_json(&parsed.output_path, &json_str)?;
         }
         "dispersion" => {
-            let env: DispersionEnvelopeDto = serde_json::from_str(&sanitized_text).map_err(|e| {
-                RunnerError::Usage(format!("Invalid JSON in dispersion envelope: {}", e))
-            })?;
+            let env: DispersionEnvelopeDto =
+                serde_json::from_str(&sanitized_text).map_err(|e| {
+                    RunnerError::Usage(format!("Invalid JSON in dispersion envelope: {}", e))
+                })?;
 
             let members: Vec<MemberInput> = env
                 .members
@@ -604,8 +610,9 @@ fn run() -> Result<(), RunnerError> {
             atomic_write_json(&parsed.output_path, &json_str)?;
         }
         "chain" => {
-            let env: ChainEnvelopeDto = serde_json::from_str(&sanitized_text)
-                .map_err(|e| RunnerError::Usage(format!("Invalid JSON in chain envelope: {}", e)))?;
+            let env: ChainEnvelopeDto = serde_json::from_str(&sanitized_text).map_err(|e| {
+                RunnerError::Usage(format!("Invalid JSON in chain envelope: {}", e))
+            })?;
 
             let cluster_cfg: Option<ScenarioConfig> = match &env.cluster_config {
                 Some(c) => {

@@ -1,6 +1,8 @@
-//! Pure Rust computational core for ensemble scenario generation (PCA + K-means).
-//!
-//! Exposes the single public entry point `cluster(&TaskInput) -> Result<ScenarioResult, CoreError>`.
+//! Pure Rust computational core for M0–M3 ensemble scenario analysis:
+//! single-batch scenario clustering (`cluster`), spatial ensemble dispersion
+//! (`ensemble_dispersion`), cross-batch 1-to-1 backbone matching (`match_scenarios`,
+//! `match_scenarios_scaled`), and many-to-many scenario evolution (`evolve_scenarios`,
+//! `evolve_scenarios_scaled`, `evolve_chain`).
 //! Does not depend on DuckDB, Arrow, Python, external BLAS/LAPACK, or filesystem I/O.
 
 #![allow(
@@ -11,6 +13,7 @@
 )]
 
 pub mod dispersion;
+pub mod evolution;
 pub mod fsum;
 pub mod kmeans;
 pub mod matching;
@@ -18,6 +21,17 @@ pub mod preprocess;
 pub mod summary;
 
 pub use dispersion::ensemble_dispersion;
+pub use evolution::{
+    BackboneAssertion, ChainBatchInput, ChainBatchStatus, ChainEvolutionEdge, ChainEvolutionEvent,
+    ChainNodeSummary, ChainResolvedBatch, ChainTransitionRecord, ChainTransitionStatus,
+    DEFAULT_CHAIN_RUN_KEY_PREFIX, EVOLUTION_ALGORITHM_VERSION, EdgeAlternativeStatus, EdgeRole,
+    EvolutionBranchSummary, EvolutionChainInput, EvolutionChainResult, EvolutionChainSummary,
+    EvolutionConfig, EvolutionEdge, EvolutionEvent, EvolutionInput, EvolutionResult, FLOW_RULE_V1,
+    FlowRule, MAX_CHAIN_BATCHES, MIN_CHAIN_BATCHES, NON_PHYSICAL_DISCLAIMER, NodeEvolutionSummary,
+    NodeRole, SECONDARY_RULE_V1, ScaledEvolutionInput, SecondaryRule, TransitionEventKind,
+    TransitionEvolutionSummary, UNCERTAINTY_RULE_V1, UncertaintyReason, UnmatchedReason,
+    evolve_chain, evolve_scenarios, evolve_scenarios_scaled,
+};
 pub use matching::{
     MATCH_ALGORITHM_VERSION, MAX_SCENARIOS, MAX_SCENARIOS_PER_SIDE, MatchInput, MatchObjective,
     MatchResult, MatchedLink, ScaledMatchInput, ScenarioNodeInput, Substitutability,
@@ -157,7 +171,14 @@ pub enum CoreErrorCode {
     ZeroDispersion,
     ExceededScenarioLimit,
     TooManyScenarios,
+    InvalidScenarioId,
     DuplicateScenarioId,
+    ZeroMemberScenario,
+    InvalidMemberFraction,
+    InvalidFractionSum,
+    InvalidEvolutionConfig,
+    InvalidPrimaryLink,
+    BackboneInconsistency,
 }
 
 impl CoreErrorCode {
@@ -188,7 +209,14 @@ impl CoreErrorCode {
             Self::ZeroDispersion => "ZERO_DISPERSION",
             Self::ExceededScenarioLimit => "TOO_MANY_SCENARIOS",
             Self::TooManyScenarios => "TOO_MANY_SCENARIOS",
+            Self::InvalidScenarioId => "INVALID_SCENARIO_ID",
             Self::DuplicateScenarioId => "DUPLICATE_SCENARIO_ID",
+            Self::ZeroMemberScenario => "ZERO_MEMBER_SCENARIO",
+            Self::InvalidMemberFraction => "INVALID_MEMBER_FRACTION",
+            Self::InvalidFractionSum => "INVALID_FRACTION_SUM",
+            Self::InvalidEvolutionConfig => "INVALID_EVOLUTION_CONFIG",
+            Self::InvalidPrimaryLink => "INVALID_PRIMARY_LINK",
+            Self::BackboneInconsistency => "BACKBONE_INCONSISTENCY",
         }
     }
 }

@@ -366,7 +366,10 @@ fn rmse_division_overflow_fails_instead_of_unmatched() {
 
 #[test]
 fn error_code_names_and_indices_match_contract() {
-    assert_eq!(CoreErrorCode::TooManyScenarios.as_str(), "TOO_MANY_SCENARIOS");
+    assert_eq!(
+        CoreErrorCode::TooManyScenarios.as_str(),
+        "TOO_MANY_SCENARIOS"
+    );
     let err = match_scenarios(&MatchInput {
         weights: vec![1.0],
         threshold: 1.0,

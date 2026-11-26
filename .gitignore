@@ -38,3 +38,7 @@ tutorial/data
 /validation/m0/fixtures/real_ifs_ens_20200101_t2m_data.json
 /specs/001-m0-baseline-validation/spikes/data/sample.csv
 /specs/001-m0-baseline-validation/spikes/data/sample.json
+
+# M3 run evidence and derived data payloads.
+/artifacts/m3/
+/validation/m3/data/

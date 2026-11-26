@@ -88,49 +88,49 @@ pub struct MatchResult {
 }
 
 #[derive(Clone, Debug)]
-struct DpValue {
-    count: usize,
-    sum: Expansion,
+pub(crate) struct DpValue {
+    pub(crate) count: usize,
+    pub(crate) sum: Expansion,
 }
 
-fn cmp_dp_val(a: &DpValue, b: &DpValue) -> Ordering {
+pub(crate) fn cmp_dp_val(a: &DpValue, b: &DpValue) -> Ordering {
     // Greater count is better (Less in our ordering)
     b.count.cmp(&a.count).then_with(|| a.sum.cmp_exact(&b.sum))
 }
 
 #[derive(Clone, Copy, Default)]
-struct Constraint {
-    forbid: Option<(usize, usize)>, // (canonical_row, canonical_col)
-    force_row: Option<usize>,
-    force_col: Option<usize>,
+pub(crate) struct Constraint {
+    pub(crate) forbid: Option<(usize, usize)>, // (canonical_row, canonical_col)
+    pub(crate) force_row: Option<usize>,
+    pub(crate) force_col: Option<usize>,
 }
 
-struct CanonContext<'a> {
-    m: usize,
-    n: usize,
-    dist: &'a [Vec<f64>],
-    tau: f64,
-    rows: Vec<usize>, // canonical row -> original prev index
-    cols: Vec<usize>, // canonical col -> original cur index
+pub(crate) struct CanonContext<'a> {
+    pub(crate) m: usize,
+    pub(crate) n: usize,
+    pub(crate) dist: &'a [Vec<f64>],
+    pub(crate) tau: f64,
+    pub(crate) rows: Vec<usize>, // canonical row -> original prev index
+    pub(crate) cols: Vec<usize>, // canonical col -> original cur index
 }
 
 impl CanonContext<'_> {
-    fn d(&self, r: usize, c: usize) -> f64 {
+    pub(crate) fn d(&self, r: usize, c: usize) -> f64 {
         self.dist[self.rows[r]][self.cols[c]]
     }
 
-    fn feasible(&self, r: usize, c: usize, k: &Constraint) -> bool {
+    pub(crate) fn feasible(&self, r: usize, c: usize, k: &Constraint) -> bool {
         self.d(r, c) <= self.tau && k.forbid != Some((r, c))
     }
 }
 
-struct SolvedMatching {
-    val: DpValue,
-    optima_count: usize,
-    pairs: Vec<(usize, usize)>, // canonical (row, col)
+pub(crate) struct SolvedMatching {
+    pub(crate) val: DpValue,
+    pub(crate) optima_count: usize,
+    pub(crate) pairs: Vec<(usize, usize)>, // canonical (row, col)
 }
 
-fn solve_dp(
+pub(crate) fn solve_dp(
     ctx: &CanonContext,
     constraint: &Constraint,
 ) -> Result<Option<SolvedMatching>, CoreError> {
@@ -257,7 +257,7 @@ fn solve_dp(
     }))
 }
 
-fn canonical_scenario_order(scenarios: &[ScenarioNodeInput]) -> Vec<usize> {
+pub(crate) fn canonical_scenario_order(scenarios: &[ScenarioNodeInput]) -> Vec<usize> {
     let mut order: Vec<usize> = (0..scenarios.len()).collect();
     let norm = |x: f64| if x == 0.0 { 0.0 } else { x };
     order.sort_by(|&a, &b| {

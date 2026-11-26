@@ -1,4 +1,5 @@
-//! M0/M1/M2 DuckDB extension: exposes `ens_m0_echo`, `ens_cluster`, `ens_dispersion`, and `ens_match_scenarios`.
+//! M0–M3 DuckDB extension: exposes `ens_m0_echo`, `ens_cluster`, `ens_dispersion`,
+//! `ens_match_scenarios`, `ens_fsum`, `ens_evolve_scenarios`, and `ens_diagnose_batch`.
 
 #![allow(
     unsafe_op_in_unsafe_fn,
@@ -6,6 +7,7 @@
     clippy::needless_range_loop
 )]
 
+pub mod evolve_ext;
 pub mod match_ext;
 
 use std::{
@@ -43,10 +45,10 @@ const CLUSTER_FUNCTION_NAME: &str = "ens_cluster";
 // Error Handling
 // ---------------------------------------------------------------------------
 
-struct SqlError {
-    code: &'static str,
-    row: u64,
-    message: String,
+pub(crate) struct SqlError {
+    pub(crate) code: &'static str,
+    pub(crate) row: u64,
+    pub(crate) message: String,
 }
 
 impl SqlError {
@@ -95,20 +97,20 @@ impl SqlError {
     }
 }
 
-fn set_error_raw(info: duckdb_function_info, c_str: &CString) {
+pub(crate) fn set_error_raw(info: duckdb_function_info, c_str: &CString) {
     unsafe {
         duckdb_scalar_function_set_error(info, c_str.as_ptr());
     }
 }
 
-fn row_is_valid(validity: *mut u64, row: u64) -> bool {
+pub(crate) fn row_is_valid(validity: *mut u64, row: u64) -> bool {
     if validity.is_null() {
         return true;
     }
     unsafe { duckdb_validity_row_is_valid(validity, row) }
 }
 
-unsafe fn read_string(vector: duckdb_vector, row: u64) -> String {
+pub(crate) unsafe fn read_string(vector: duckdb_vector, row: u64) -> String {
     unsafe {
         let data = duckdb_vector_get_data(vector) as *const duckdb_string_t;
         let string = *data.add(row as usize);
@@ -123,7 +125,7 @@ unsafe fn read_string(vector: duckdb_vector, row: u64) -> String {
 // Type Builders
 // ---------------------------------------------------------------------------
 
-fn build_members_type() -> duckdb_logical_type {
+pub(crate) fn build_members_type() -> duckdb_logical_type {
     unsafe {
         let mut varchar = duckdb_create_logical_type(DUCKDB_TYPE_DUCKDB_TYPE_VARCHAR);
         let mut double = duckdb_create_logical_type(DUCKDB_TYPE_DUCKDB_TYPE_DOUBLE);
@@ -149,7 +151,7 @@ fn build_members_type() -> duckdb_logical_type {
     }
 }
 
-fn build_config_type() -> duckdb_logical_type {
+pub(crate) fn build_config_type() -> duckdb_logical_type {
     unsafe {
         let mut bigint_t = duckdb_create_logical_type(DUCKDB_TYPE_DUCKDB_TYPE_BIGINT);
         let mut double_t = duckdb_create_logical_type(DUCKDB_TYPE_DUCKDB_TYPE_DOUBLE);
@@ -411,7 +413,7 @@ unsafe fn reserve_list(vector: duckdb_vector, size: usize) -> Result<(), &'stati
     Ok(())
 }
 
-unsafe fn extract_task(
+pub(crate) unsafe fn extract_task(
     members_vec: duckdb_vector,
     config_vec: duckdb_vector,
     row: u64,
@@ -1463,6 +1465,10 @@ unsafe fn register(connection: duckdb::ffi::duckdb_connection) -> Result<(), Str
 
         // 3. Register M2 functions (ens_dispersion and ens_match_scenarios)
         match_ext::register_match_functions(connection)?;
+
+        // 4. Register M3 functions (ens_fsum, ens_evolve_scenarios, and ens_diagnose_batch)
+        evolve_ext::register_evolve_functions(connection)?;
+        evolve_ext::register_diagnose_function(connection)?;
 
         Ok(())
     }

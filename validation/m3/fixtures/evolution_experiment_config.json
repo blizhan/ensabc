@@ -1,0 +1,347 @@
+{
+  "clustering": {
+    "algorithm_version": "m1.native.v1",
+    "cluster_count": 3,
+    "initial_centers": [],
+    "initialization": "kmeans++_chacha8_v1",
+    "max_iterations": 300,
+    "projection_dim": 2,
+    "rank_threshold": 1e-10,
+    "restarts": 10,
+    "seed": 3,
+    "stopping_rule": "sklearn_variance_scaled_v1",
+    "tolerance": 0.0001
+  },
+  "clustering_sensitivity": {
+    "axes": {
+      "chain_break_degenerate": {
+        "description": "Natural single-batch algorithm failure (INSUFFICIENT_RANK / AMBIGUOUS_SUBSPACE / EMPTY_CLUSTER) chain-break boundary configurations",
+        "variants": [
+          {
+            "cluster_count": 3,
+            "config_id": "degenerate_k3_p3_rank0p35",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 3,
+            "rank_threshold": 0.35,
+            "restarts": 10,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          },
+          {
+            "cluster_count": 8,
+            "config_id": "degenerate_k8_p2_seed3_r10",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 2,
+            "rank_threshold": 1e-10,
+            "restarts": 10,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          },
+          {
+            "cluster_count": 3,
+            "config_id": "degenerate_k3_p3_rank0p05",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 3,
+            "rank_threshold": 0.05,
+            "restarts": 10,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          }
+        ]
+      },
+      "cluster_count": {
+        "cluster_counts": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "description": "Scenario count axis with fixed projection_dim=2, seed=3, restarts=10",
+        "variants": [
+          {
+            "cluster_count": 2,
+            "config_id": "k2_p2_seed3_r10",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 2,
+            "rank_threshold": 1e-10,
+            "restarts": 10,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          },
+          {
+            "cluster_count": 3,
+            "config_id": "k3_p2_seed3_r10",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 2,
+            "rank_threshold": 1e-10,
+            "restarts": 10,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          },
+          {
+            "cluster_count": 4,
+            "config_id": "k4_p2_seed3_r10",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 2,
+            "rank_threshold": 1e-10,
+            "restarts": 10,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          },
+          {
+            "cluster_count": 5,
+            "config_id": "k5_p2_seed3_r10",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 2,
+            "rank_threshold": 1e-10,
+            "restarts": 10,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          }
+        ]
+      },
+      "initialization_and_restarts": {
+        "description": "Random seed and restart count axis with fixed cluster_count=3, projection_dim=2",
+        "seed_restarts_pairs": [
+          [
+            0,
+            10
+          ],
+          [
+            42,
+            10
+          ],
+          [
+            3,
+            1
+          ]
+        ],
+        "variants": [
+          {
+            "cluster_count": 3,
+            "config_id": "k3_p2_seed0_r10",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 2,
+            "rank_threshold": 1e-10,
+            "restarts": 10,
+            "seed": 0,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          },
+          {
+            "cluster_count": 3,
+            "config_id": "k3_p2_seed42_r10",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 2,
+            "rank_threshold": 1e-10,
+            "restarts": 10,
+            "seed": 42,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          },
+          {
+            "cluster_count": 3,
+            "config_id": "k3_p2_seed3_r1",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 2,
+            "rank_threshold": 1e-10,
+            "restarts": 1,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          }
+        ]
+      },
+      "projection_dim": {
+        "description": "PCA projection dimension axis with fixed cluster_count=3, seed=3, restarts=10",
+        "projection_dims": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "variants": [
+          {
+            "cluster_count": 3,
+            "config_id": "k3_p1_seed3_r10",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 1,
+            "rank_threshold": 1e-10,
+            "restarts": 10,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          },
+          {
+            "cluster_count": 3,
+            "config_id": "k3_p2_seed3_r10",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 2,
+            "rank_threshold": 1e-10,
+            "restarts": 10,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          },
+          {
+            "cluster_count": 3,
+            "config_id": "k3_p3_seed3_r10",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 3,
+            "rank_threshold": 1e-10,
+            "restarts": 10,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          },
+          {
+            "cluster_count": 3,
+            "config_id": "k3_p4_seed3_r10",
+            "initial_centers": [],
+            "initialization": "kmeans++_chacha8_v1",
+            "max_iterations": 300,
+            "projection_dim": 4,
+            "rank_threshold": 1e-10,
+            "restarts": 10,
+            "seed": 3,
+            "stopping_rule": "sklearn_variance_scaled_v1",
+            "tolerance": 0.0001
+          }
+        ]
+      }
+    },
+    "threshold_coefficient": 1.0
+  },
+  "description": "Frozen experiment parameters for M3 scenario evolution replay, 18-cell threshold grid, 4-axis clustering sensitivity matrix, and multi-level perturbation stability verification",
+  "evolution": {
+    "algorithm_version": "m3.evolve.v1",
+    "flow_rule": "star_min_mass_proportional_v1",
+    "fraction_sum_tolerance": 1e-09,
+    "high_uncertainty_optimality_ratio": 0.1,
+    "high_uncertainty_secondary_ratio": 0.1,
+    "high_uncertainty_threshold_ratio": 0.1,
+    "non_physical_disclaimer": "algorithmic_attribution_only_not_physical_member_migration",
+    "secondary_rule": "nearest_feasible_v1",
+    "uncertainty_rule": "m3.uncertainty.v1"
+  },
+  "history_replay": {
+    "baseline_cluster_count": 3,
+    "baseline_threshold_coefficient": 1.0,
+    "planned_batch_count": 8,
+    "planned_interval_hours": 12,
+    "valid_time_utc": "2020-01-05T00:00:00Z",
+    "whitelisted_batch_failure_codes": [
+      "INSUFFICIENT_RANK",
+      "AMBIGUOUS_SUBSPACE",
+      "EMPTY_CLUSTER",
+      "NOT_CONVERGED",
+      "INSUFFICIENT_DISTINCT_VECTORS",
+      "INSUFFICIENT_PROJECTED_VECTORS",
+      "SVD_NOT_CONVERGED",
+      "ZERO_DISPERSION"
+    ]
+  },
+  "matching": {
+    "algorithm_version": "m2.match.v1",
+    "primary_objective": "maximize_matched_count",
+    "secondary_objective": "minimize_weighted_distance_sum",
+    "spatial_weights_id": "cos_lat_center_v1",
+    "threshold_coefficient": 1.0,
+    "tie_breaking": "canonical_key_total_cmp_v1"
+  },
+  "non_physical_disclaimer": "algorithmic_attribution_only_not_physical_member_migration",
+  "perturbation": {
+    "level_1a_mean_field": {
+      "directions": 100,
+      "epsilon_ratios": [
+        0.005,
+        0.01,
+        0.02
+      ],
+      "loop_order": "epsilon_then_pair_then_direction_0_to_99",
+      "method": "weighted_rms_sphere_surface_sampling_pcg64",
+      "numpy_version": "2.5.4",
+      "rng": "numpy_pcg64",
+      "seed": 20261029
+    },
+    "level_1b_fraction_only": {
+      "delta_fraction": 0.02,
+      "delta_members": 1,
+      "ensemble_member_count": 50,
+      "method": "all_ordered_cluster_pairs_plus_minus_delta_members"
+    },
+    "level_2_member_perturbation": {
+      "ambiguous_mapping_status": "evaluation_mapping_ambiguous",
+      "loop_order": "sigma_then_sample_0_to_19",
+      "method": "gaussian_iid_pcg64",
+      "numpy_version": "2.5.4",
+      "rng": "numpy_pcg64",
+      "samples": 20,
+      "scenario_mapping": "maximum_member_overlap_bipartite",
+      "seed": 4242,
+      "sigma_levels_k": [
+        0.0,
+        0.001,
+        0.01
+      ]
+    },
+    "stability_certificate": {
+      "arithmetic": "exact_fraction_outward_interval",
+      "condition_1_active_threshold": "lower(|d_ij - tau|) > upper(2 * epsilon_abs + c * delta_S) for (i,j) in E_evol U {d_ij > tau}",
+      "condition_2_primary_optimality": "lower(delta_sigma_e) > upper(4 * q_star * epsilon_abs) for SameCount primary edges",
+      "condition_3_unique_primary_optimum": "optima_count == 1",
+      "condition_4_secondary_nearest": "no secondary distance tie and lower(d_(2)(u) - d_(1)(u)) > upper(4 * epsilon_abs) for |F(u)| >= 2",
+      "schema_version": "m3.certificate.v1"
+    }
+  },
+  "schema_version": "m3.experiment_config.v1",
+  "threshold_grid": {
+    "cluster_counts": [
+      2,
+      3,
+      4
+    ],
+    "threshold_coefficients": [
+      0.5,
+      0.75,
+      1.0,
+      1.25,
+      1.5,
+      2.0
+    ],
+    "total_combinations": 18
+  }
+}
